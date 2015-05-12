@@ -7,6 +7,16 @@ Python project IPFIT5 groep 5
 3. Wesley Boumans
 4. Michael van Huis
 
+##PEP8
+Richtlijnen volgens 'goed' Python programmeren.
+Controleer de code volgens http://pep8online.com.
+
+Regels:
+* joined_lower for **functions, methods, attributes**
+* joined_lower or ALL_CAPS for **constants**
+* StudlyCaps for **classes**
+* camelCase only to conform to pre-existing **conventions**
+
 ## Github commands
 ### Git status
 Bekijk welke documenten gewijzigd zijn ten opzichte van de oline versie.
