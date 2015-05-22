@@ -7,6 +7,9 @@ Python project IPFIT5 groep 5
 3. Wesley Boumans
 4. Michael van Huis
 
+# Opdrachtgever
+1. Peter van der Wijden
+
 ##PEP8
 Richtlijnen volgens 'goed' Python programmeren.
 Controleer de code volgens http://pep8online.com.
