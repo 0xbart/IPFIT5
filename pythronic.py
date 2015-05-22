@@ -10,10 +10,11 @@
 from sys import platform as _platform
 import setup
 import os
+import functions
 
-opeSys = False
+opeSys      = False
 opeSysSlash = False
-user = False
+user        = False
 
 
 def main():
@@ -21,7 +22,7 @@ def main():
     printWelcomeScreen()
     startApplication()
     login()
-    print ("succesvol ingelogd! : ", user)
+    getCase()
 
 
 def startApplication():
@@ -68,22 +69,27 @@ def login():
     print (' Login first:\n')
     username = input(" Username: ")
     password = input(" Password: ")
+    authUser = username
 
-    while (checkLogin(username, password)):
+    while (functions.checkLogin(username, password)):
         print ('\n Login failed, try again: \n')
         username = input(" Username: ")
         password = input(" Password: ")
-        checkLogin(username, password)
+        if not functions.checkLogin(username, password):
+            authUser = username
 
-    return True
+    global user
+    user = authUser
+    return user
 
 
-def checkLogin(username, password):
-    if username == 'bart' and password == 'bart':
-        global user
-        user = username
-        return False
-    else:
-        return True
+def menu():
+    printWelcomeScreen()
+    print ('\n Welcome ', user, ', make a choice:\n\n')
+    print ('menu item 1')
+    print ('menu item 2')
+    print ('menu item 3')
 
-main()
+
+if __name__ == "__main__":
+    main()

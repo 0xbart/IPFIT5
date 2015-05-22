@@ -10,15 +10,19 @@
     SETUP ONLY SCRIPT
 """
 import sqlite3
-import hashlib
+import functions
 
 def createDatabase():
-    db = sqlite3.connect("db/pythronic.db")
-
-    createDBTables(db)
-    createDBUser(db)
-
-    db.close()
+    db = None
+    try:
+        db = sqlite3.connect("db/pythronic.db")
+        createDBTables(db)
+        createDBUser(db)
+    except e:
+        print (" [ERROR] Database couldn't created succesfully.")
+    finally:
+        if db:
+            db.close()
 
 
 def createDBTables(db):
@@ -26,9 +30,12 @@ def createDBTables(db):
     sql = ('''CREATE TABLE users (id INTEGER PRIMARY KEY,
               name TEXT, pass TEXT, deleted INTEGER);
               CREATE TABLE logs (id INTEGER PRIMARY KEY,
-              datetime TIMESTAMP, description TEXT)''')
+              datetime TIMESTAMP, description TEXT);
+              CREATE TABLE cases (id INTEGER PRIMARY KEY,
+              name TEXT, description TEXT, owner TEXT,
+              created_at TIMESTAMP, deleted INTEGER)''')
     db.executescript(sql)
-    print (" [INFO]: Tables `users` and `logs` created succesfully.\n")
+    print (" [INFO]: Tables `users`, `logs`, `cases` created succesfully.\n")
 
 
 def createDBUser(db):
@@ -37,5 +44,5 @@ def createDBUser(db):
 
     cursor = db.cursor()
     cursor.execute('''INSERT INTO users (name, pass, deleted) VALUES (?,?,?)''',
-                      (username, hashlib.md5(password.encode('utf-8')).hexdigest(), '0'))
+                      (username, functions.getHash(password), '0'))
     db.commit()
