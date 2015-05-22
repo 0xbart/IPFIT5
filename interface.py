@@ -8,6 +8,7 @@
 import datetime
 import time
 import sys
+import filehash
 
 # Welcome message
 print("Welcome to Pyrensic 0.1 ")
@@ -26,16 +27,18 @@ org = input("Organization: ")
 logfile = open("logfile.txt", "w")
 logfile.write("Program executed on: " + timestamp + "\n\n" + "By: " + name + "\n" + "Casenumber: " + casenumber + "\n" + "Organization: " + org + "\n")
 
-print("1: File hashing\n" + "2: Data recovery\n" + "3: Example" + "\n" + "0: Exit program" + "\n")
+# "Interface"
+print("\n" + "Make a choice: " + "\n"  + "1: File hashing\n" + "2: Data recovery\n" + "3: Example" + "\n" + "0: Exit program" + "\n")
 
-options = int(input("Choose a option: " + "\n"))
+# Input option
+options = int(input("Input: " + "\n"))
 
 # Menu config
 def menu():
     if options == 1:
-        print("Chosen option 1!")
+        filehash.hash()
     elif options == 2:
-        print("Chosen option 2!")
+        print("Chosen option 2")
     elif options == 3:
         print("Chosen option 3!")
     elif options == 0:
@@ -49,3 +52,9 @@ menu()
 
 # with open("logfile.txt", "a") as logfile:
 #   logfile.write("appended text")
+
+if __name__ == '__main__':
+    for x in range(100):
+        print("\n" + "Choose a function." + "\n"  + "1: File hashing\n" + "2: Data recovery\n" + "3: Example" + "\n" + "0: Exit program" + "\n")
+        options = int(input("\n" + "Input:  " + "\n"))
+        menu()
