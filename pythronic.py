@@ -13,17 +13,22 @@ import os
 
 opeSys = False
 opeSysSlash = False
+user = False
 
 
 def main():
     detectOs()
     printWelcomeScreen()
     startApplication()
+    login()
+    print ("succesvol ingelogd! : ", user)
 
 
 def startApplication():
     if not os.path.isfile("./db/pythronic.db"):
+        print (" [ERROR]: Database doesn't exist; executing setup.\n")
         setup.createDatabase()
+        printWelcomeScreen()
 
 
 def detectOs():
@@ -45,13 +50,8 @@ def detectOs():
 
 def printWelcomeScreen():
     clearScreen()
-
-    # message = '######################\n\n'
-    # message += ' Welcome by Pytronic! \n\n'
-    # message += '######################\n'
-
-    message = '\n Welcome by Pytronic! \n\n'
-
+    message = '\n'
+    message += ' Welcome by Pytronic! \n\n'
     return print (message)
 
 
@@ -63,5 +63,27 @@ def clearScreen():
     elif opeSys == "windows":
         os.system("cls")
 
+
+def login():
+    print (' Login first:\n')
+    username = input(" Username: ")
+    password = input(" Password: ")
+
+    while (checkLogin(username, password)):
+        print ('\n Login failed, try again: \n')
+        username = input(" Username: ")
+        password = input(" Password: ")
+        checkLogin(username, password)
+
+    return True
+
+
+def checkLogin(username, password):
+    if username == 'bart' and password == 'bart':
+        global user
+        user = username
+        return False
+    else:
+        return True
 
 main()
