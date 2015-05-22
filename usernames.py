@@ -2,6 +2,7 @@ __author__ = 'Michael'
 
 import getpass
 import socket
+import platform
 
 def userinfo():
 #User info
