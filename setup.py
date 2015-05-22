@@ -46,3 +46,7 @@ def createDBUser(db):
     cursor.execute('''INSERT INTO users (name, pass, deleted) VALUES (?,?,?)''',
                       (username, functions.getHash(password), '0'))
     db.commit()
+
+
+if __name__ == '__main__':
+    print ("[ERROR]: setup.py can only be opened by pythronic.py.")
