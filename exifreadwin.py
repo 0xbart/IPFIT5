@@ -12,6 +12,6 @@ for root, subdirs, files in os.walk(path):
             f = open(path_name, 'rb')
             tags = exifread.process_file(f)
             if not tags:
-                print(path_name, "(No exif data)")
+                pass
             else:
                 print(path_name, tags)
