@@ -17,10 +17,24 @@ def getHash(x):
 def checkLogin(username, password):
     db = sqlite3.connect("db/pythronic.db")
     cursor = db.cursor()
-    x = cursor.execute("SELECT EXISTS(SELECT 1 FROM users WHERE name = '" + username + "'\
-                        AND pass = '" + getHash(password) + "');")
+    countRows = cursor.execute("SELECT EXISTS(SELECT 1 FROM users WHERE name = '" + username + "'\
+                                AND pass = '" + getHash(password) + "');")
 
-    if x.fetchone()[0] == 1:
+    if countRows.fetchone()[0] == 1:
         return False
     else:
         return True
+
+
+def getCases():
+    db = sqlite3.connect("db/pythronic.db")
+    cursor = db.cursor()
+    cases = cursor.execute("SELECT id, name FROM cases WHERE deleted = '0'")
+    return cases.fetchall()
+
+
+def getCasesNumbers():
+    db = sqlite3.connect("db/pythronic.db")
+    cursor = db.cursor()
+    cases = cursor.execute("SELECT id FROM cases WHERE deleted = '0'")
+    return cases.fetchall()

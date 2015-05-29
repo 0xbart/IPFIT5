@@ -15,6 +15,7 @@ import functions
 opeSys      = False
 opeSysSlash = False
 user        = False
+case        = False
 
 
 def main():
@@ -23,6 +24,7 @@ def main():
     startApplication()
     login()
     getCase()
+    menu()
 
 
 def startApplication():
@@ -83,12 +85,44 @@ def login():
     return user
 
 
+def getCase():
+    printWelcomeScreen()
+    while True:
+        print (' 1. New case\n 2. Load case')
+        choice = int(input('\n Make a choice: '))
+        if choice == 1:
+            print (" You entered new case!")
+            break
+        elif choice == 2:
+            cases = functions.getCases()
+            if len(cases) > 0:
+                loadCase(cases)
+                break
+            else:
+                print ("\n No cases found in the database.\n")
+        else:
+            print (" \nWrong input, try again!\n")
+
+
+def loadCase(cases):
+    printWelcomeScreen()
+    casesNumbers = functions.getCasesNumbers()
+    print (" Following cases are found:\n")
+    while True:
+        for case in cases:
+            print(' {0}: {1}'.format(case[0], case[1]))
+        choice = int(input('\n Select case: '))
+        if choice in casesNumbers:
+            global case
+            case = choice
+            return case
+        else:
+            print ("\n Wrong input, try again!\n")
+
+
 def menu():
     printWelcomeScreen()
-    print ('\n Welcome ', user, ', make a choice:\n\n')
-    print ('menu item 1')
-    print ('menu item 2')
-    print ('menu item 3')
+    print (" Welcome ", user, ",\n\n Your casenumber: ", case)
 
 
 if __name__ == "__main__":
