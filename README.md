@@ -22,7 +22,7 @@ Regels:
 
 ### Github commands
 #### Git status
-Bekijk welke documenten gewijzigd zijn ten opzichte van de oline versie.
+Bekijk welke documenten gewijzigd zijn ten opzichte van de online versie.
 ```
 git status
 ```
