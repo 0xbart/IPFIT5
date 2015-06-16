@@ -29,9 +29,12 @@ def main():
 
 def startApplication():
     if not os.path.isfile('./db/pythronic.db'):
+        printWelcomeScreen()
         print (' [ERROR]: Database doesn\'t exist; executing setup.\n')
         setup.createDatabase()
-    printWelcomeScreen()
+    else:
+        printWelcomeScreen()
+
 
 
 def detectOs():
@@ -69,18 +72,19 @@ def clearScreen():
 
 def login():
     print ' Login first:\n'
-    username = functions.askInput('Enter username', 's')
-    password = functions.askInput('Enter password', 's')
 
     global user
     user = None
 
-    while (functions.checkLogin(username, password)):
-        print '\n Login failed, try again. \n'
+    while True:
         username = functions.askInput('Enter username', 's')
         password = functions.askInput('Enter password', 's')
-        if not functions.checkLogin(username, password):
+
+        if functions.checkLogin(username, password):
             user = username
+            break
+        else:
+            print '\n Login failed, try again. \n'
 
     return user
 
@@ -96,7 +100,7 @@ def newCase():
             if functions.createCase(name, desc, user):
                 print 'check 2'
                 print (' [Info]: Case succesfully created.')
-                return True
+                return functions.getCaseID(name)
         else:
             print '\n [Error]: Name can only be alphabetic.\n'
     return False
@@ -110,6 +114,8 @@ def getCase():
         if choice == 1:
             new = newCase()
             if new:
+                global casenr
+                casenr = new
                 break
             else:
                 print '\n Error while creating new case'
@@ -142,7 +148,7 @@ def loadCase(cases):
 
 def menu():
     printWelcomeScreen()
-    print ' Welcome ', user, ',\n\n Your casenumber: ', casenr
+    print ' Welcome ' + str(user) + ',\n Casenumber: ' + str(casenr)
 
 
 def signal_handler(signal, frame):

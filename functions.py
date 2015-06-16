@@ -50,9 +50,9 @@ def checkLogin(username, password):
                                 AND pass = '" + getHash(password) + "');")
 
     if countRows.fetchone()[0] == 1:
-        return False
-    else:
         return True
+    else:
+        return False
 
 
 def getCases():
@@ -60,6 +60,18 @@ def getCases():
     cursor = db.cursor()
     cases = cursor.execute("SELECT id, name FROM cases WHERE deleted = '0'")
     return cases.fetchall()
+
+
+def getCaseID(name):
+    ID = False
+    try:
+        db = sqlite3.connect('db/pythronic.db')
+        cursor = db.cursor()
+        case = cursor.execute("SELECT id FROM cases WHERE name = '"+ name + "'")
+        ID = case.fetchone()[0]
+    except:
+        print ' [Error]: Error while getting the case number.'
+    return ID
 
 
 def checkCaseExist(name):
@@ -82,7 +94,7 @@ def getCasesNumbers():
 
 def createCase(name, desc, user):
     result = False
-    
+
     if not checkCaseExist(name):
         db = sqlite3.connect("db/pythronic.db")
         cursor = db.cursor()

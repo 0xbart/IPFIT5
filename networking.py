@@ -1,6 +1,8 @@
 import subprocess
 import os
 
+operationSoftware = None
+
 #Determine operating system
 def determine():
     global operationSoftware
