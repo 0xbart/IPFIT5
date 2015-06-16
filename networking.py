@@ -30,7 +30,7 @@ def network():
 
 def sortingProc():
     global operationSoftware
-    unixKeywords = ["inet", "media"]
+    unixKeywords = ["inet"]
     windowsKeywords = ["IP", "DHCP"]
     temp = []
 
