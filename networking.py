@@ -26,9 +26,8 @@ def network():
 
 def sortingProc():
     global operationSoftware
-    unixKeywords = ["inet", "IP"]
+    unixKeywords = ["inet", "media"]
     windowsKeywords = ["IP", "DHCP"]
-
     temp = []
 
     if operationSoftware == "Windows":
