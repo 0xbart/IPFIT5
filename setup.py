@@ -39,8 +39,8 @@ def createDBTables(db):
 
 
 def createDBUser(db):
-    username = input(" Username: ")
-    password = input(" Password: ")
+    username = functions.askInput("Enter username", "s")
+    password = functions.askInput("Enter password", "s")
 
     cursor = db.cursor()
     cursor.execute('''INSERT INTO users (name, pass, deleted) VALUES (?,?,?)''',
