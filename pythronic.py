@@ -14,11 +14,12 @@ import sys
 import functions
 import signal
 
-opeSys      = None
+opeSys = None
 opeSysSlash = None
-user        = None
-casenr      = None
-casename    = None
+user = None
+casenr = None
+casename = None
+
 
 def main():
     detectOs()
@@ -35,7 +36,6 @@ def startApplication():
         setup.createDatabase()
 
     printWelcomeScreen()
-
 
 
 def detectOs():
@@ -58,14 +58,16 @@ def detectOs():
 def printWelcomeScreen():
     clearScreen()
     message = '\n'
-    message += ' Welcome by Pytronic! \n\n'
+    message += ' WELCOME BY PYTHRONIC! \n\n'
 
     if user:
         message += ' Welcome ' + str(user) + '.\n'
-    elif str(casename) == None:
-        message += ' Casenumber ' + str(casenr) + ', Casename ' + str(casename)
 
-    message += '\n ############################\n'
+    if casenr:
+        message += ' Casenumber: ' + str(casenr) + '.\n'
+        message += ' Casename: ' + str(casename) + '.\n'
+
+    message += '\n ###########################################\n\n'
 
     print message
 
@@ -130,23 +132,20 @@ def getCase():
             cases = functions.getCases()
             if len(cases) > 0:
                 if choice == 2:
-                    case = loadCase(cases)
+                    case = manageCase(cases, 'select')
                     if case:
                         break
                 elif choice == 3:
-                    print '\n Feature doensnt work at this moment!'
-                    # deleteCase(cases)
-                    # TODO
-                    # TODO
-                    # TODO
-                    # break
+                    case = manageCase(cases, 'delete')
+                    if case:
+                        print ' [INFO]: Case (nr ' + case + ') deleted!'
             else:
                 print '\n No cases found in the database.\n'
         else:
             print '\n Wrong input, try again!\n'
 
 
-def loadCase(cases):
+def manageCase(cases, action):
     printWelcomeScreen()
     casesNumbers = functions.getCasesNumbers()
     casenr = None
@@ -159,8 +158,16 @@ def loadCase(cases):
         choice = int(input('\n Select case: '))
         if choice in casesNumbers:
             details = getCaseDetails(choice)
-            if details:
-                break
+            if action == 'select':
+                if details:
+                    break
+            elif action == 'delete':
+                question = ' [WARNING]: Deleting ' + casename + '. \
+                            Y = yes, P = permanently, other keys = abort'
+                confirm = functions.askInput(question, 's')
+                if confirm.lower() == 'y' or confirm.lower() == 'p':
+                    functions.deleteCase(choice, confirm)
+                getCase()
         else:
             print '\n Wrong input, try again!\n'
 
