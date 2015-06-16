@@ -49,8 +49,8 @@ def createDBUser(db):
         password = functions.askInput("Enter password", "s")
 
         cursor = db.cursor()
-        cursor.execute('''INSERT INTO users (name, pass, deleted) VALUES (?,?,?)''',
-                      (username, functions.getHash(password), '0'))
+        cursor.execute('''INSERT INTO users (name, pass, deleted)
+            VALUES (?,?,?)''', (username, functions.getHash(password), '0'))
         db.commit()
     except:
         print ' [Error]: User cannot be created!'
