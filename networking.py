@@ -3,17 +3,21 @@ import os
 
 operationSoftware = None
 
-#Determine operating system
+# Determine operating system
+
+
 def determine():
     global operationSoftware
     if os.name == 'nt':
         print "Windows detected!"
-        operationSoftware = "Windows" #Windows
+        operationSoftware = "Windows"  # Windows
     elif os.name == 'posix':
         print "Unix detected!"
-        operationSoftware = "Unix" #Mac
+        operationSoftware = "Unix"  # Mac
 
-#Set up network command
+# Set up network command
+
+
 def network():
     global operationSoftware
     if operationSoftware == "Windows":
@@ -48,6 +52,7 @@ def sortingProc():
                     with open("output.txt", "w") as op:
                         op.writelines((items) + "," for items in temp)
             print("Output file has been created, check output.txt")
+
 
 def main():
     determine()
