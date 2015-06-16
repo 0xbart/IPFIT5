@@ -11,17 +11,17 @@ __author__ = 'Chester'
 
 while True:
     # Aantal pixels opvragen bij gebruiker.
-    pxl = raw_input("Vul het aantal pixels in dat de muis moet bewegen: ")
+    pxl = raw_input("Write the amount of pixels the\
+     mouse should be jiggling ")
     try:
         # Controle of het ingevulde karakter een getal is.
         val = int(pxl)
-        print("Het programma is gestart. \
-        Druk op crtl+c om de mousejiggler te beeindigen.")
+        print("The program has been launched. \
+        Press CTRL+C to quit.")
         break
     except ValueError:
         # Wanneer er geen getal is ingevuld, verschijnt de volgende foutmelding
-        print("Er is een ander karakter dan een getal ingevuld. \
-        Probeer het opnieuw.")
+        print("An error has occured. Please fill in a number.")
 
 
 try:
@@ -40,4 +40,4 @@ try:
 except KeyboardInterrupt:
     print '\n'
 
-print ("Het programma is beeindigd.")
+print ("The program has been terminated.")
