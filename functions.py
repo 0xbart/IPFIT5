@@ -6,6 +6,8 @@
     - Chester van den Bogaard
     - Welsey Boumans
     - Bart Mauritz
+
+    FUNCTIONS ONLY SCRIPT
 """
 import time
 import sqlite3
@@ -25,13 +27,13 @@ def askInput(message, type):
                 var = raw_input(" "+ message +": ")
                 break
             except:
-                print "\n Wrong input, try again. \n"
+                print '\n Wrong input, try again. \n'
         elif type == 'i':
             try:
-                var = int(input(" "+ message +": "))
+                var = int(input(' '+ message +': '))
                 break
             except:
-                print "\n Wrong input, try again. \n"
+                print '\n Wrong input, try again. \n'
         else:
             var = None
             break
@@ -44,7 +46,7 @@ def askInput(message, type):
 
 
 def checkLogin(username, password):
-    db = sqlite3.connect("db/pythronic.db")
+    db = sqlite3.connect('db/pythronic.db')
     cursor = db.cursor()
     countRows = cursor.execute("SELECT EXISTS(SELECT 1 FROM users WHERE name = '" + username + "'\
                                 AND pass = '" + getHash(password) + "');")
@@ -56,40 +58,75 @@ def checkLogin(username, password):
 
 
 def getCases():
-    db = sqlite3.connect("db/pythronic.db")
-    cursor = db.cursor()
-    cases = cursor.execute("SELECT id, name FROM cases WHERE deleted = '0'")
-    return cases.fetchall()
+    cases = None
+
+    try:
+        db = sqlite3.connect('db/pythronic.db')
+        cursor = db.cursor()
+        result = cursor.execute("SELECT id, name FROM cases WHERE deleted = '0'")
+        cases = result.fetchall()
+    except:
+        print ' [Error]: while getting cases of database.'
+
+    return cases
 
 
 def getCaseID(name):
     ID = False
+
     try:
         db = sqlite3.connect('db/pythronic.db')
         cursor = db.cursor()
         case = cursor.execute("SELECT id FROM cases WHERE name = '"+ name + "'")
         ID = case.fetchone()[0]
     except:
-        print ' [Error]: Error while getting the case number.'
+        print ' [Error]: Error while getting the case ID.'
+
     return ID
 
 
-def checkCaseExist(name):
-    db = sqlite3.connect("db/pythronic.db")
-    cursor = db.cursor()
-    countRows = cursor.execute("SELECT EXISTS(SELECT 1 FROM cases WHERE name = '" + name + "');")
+def getCaseName(ID):
+    name = None
 
-    if countRows.fetchone()[0] == 1:
-        return True
-    else:
+    try:
+        db = sqlite3.connect('db/pythronic.db')
+        cursor = db.cursor()
+        case = cursor.execute("SELECT name FROM cases WHERE id = '"+ ID + "'")
+        name = case.fetchone()[0]
+    except:
+        print ' [Error]: Error while getting the case name.'
+
+    return name
+
+
+def checkCaseExist(name):
+    existing = False
+
+    try:
+        db = sqlite3.connect('db/pythronic.db')
+        cursor = db.cursor()
+        countRows = cursor.execute("SELECT EXISTS(SELECT 1 FROM cases WHERE name = '" + name + "');")
+
+        if countRows.fetchone()[0] == 1:
+            existing = True
+    except:
         return False
+
+    return existing
 
 
 def getCasesNumbers():
-    db = sqlite3.connect("db/pythronic.db")
-    cursor = db.cursor()
-    cases = cursor.execute("SELECT id FROM cases WHERE deleted = '0'")
-    return cases.fetchall()
+    casesNumbers = None
+
+    try:
+        db = sqlite3.connect("db/pythronic.db")
+        cursor = db.cursor()
+        cases = cursor.execute("SELECT id FROM cases WHERE deleted = '0'")
+        casesNumbers = cases.fetchall()
+    except:
+        print ' [ERROR]: Error while getting the case numbers'
+
+    return casesNumbers
 
 
 def createCase(name, desc, user):
@@ -103,10 +140,10 @@ def createCase(name, desc, user):
         db.commit()
         result = True
     else:
-        print ("\n [ERROR]: Name case must be unique.\n")
+        print '\n [ERROR]: Name case must be unique.\n'
 
     return result
 
 
 if __name__ == '__main__':
-    print ("[ERROR]: functions.py can only be opened by pythronic.py.")
+    print ' [ERROR]: functions.py can only be opened by pythronic.py.'

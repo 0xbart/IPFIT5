@@ -18,6 +18,7 @@ opeSys      = None
 opeSysSlash = None
 user        = None
 casenr      = None
+casename    = None
 
 def main():
     detectOs()
@@ -32,8 +33,8 @@ def startApplication():
         printWelcomeScreen()
         print (' [ERROR]: Database doesn\'t exist; executing setup.\n')
         setup.createDatabase()
-    else:
-        printWelcomeScreen()
+
+    printWelcomeScreen()
 
 
 
@@ -58,6 +59,14 @@ def printWelcomeScreen():
     clearScreen()
     message = '\n'
     message += ' Welcome by Pytronic! \n\n'
+
+    if user:
+        message += ' Welcome ' + str(user) + '.\n'
+    elif str(casename) == None:
+        message += ' Casenumber ' + str(casenr) + ', Casename ' + str(casename)
+
+    message += '\n ############################\n'
+
     print message
 
 
@@ -96,9 +105,7 @@ def newCase():
         name = functions.askInput('Enter name case', 's')
         desc = functions.askInput('Enter description case', 's')
         if name.isalpha():
-            print 'check 1'
             if functions.createCase(name, desc, user):
-                print 'check 2'
                 print (' [Info]: Case succesfully created.')
                 return functions.getCaseID(name)
         else:
@@ -109,21 +116,30 @@ def newCase():
 def getCase():
     printWelcomeScreen()
     while True:
-        print ' 1. New case\n 2. Load case\n'
+        print ' 1. New case\n 2. Load case\n 3. Delete case\n'
         choice = functions.askInput('Make a choice', 'i')
         if choice == 1:
             new = newCase()
             if new:
-                global casenr
-                casenr = new
-                break
+                details = getCaseDetails(new)
+                if details:
+                    break
             else:
                 print '\n Error while creating new case'
-        elif choice == 2:
+        elif choice == 2 or choice == 3:
             cases = functions.getCases()
             if len(cases) > 0:
-                loadCase(cases)
-                break
+                if choice == 2:
+                    case = loadCase(cases)
+                    if case:
+                        break
+                elif choice == 3:
+                    print '\n Feature doensnt work at this moment!'
+                    # deleteCase(cases)
+                    # TODO
+                    # TODO
+                    # TODO
+                    # break
             else:
                 print '\n No cases found in the database.\n'
         else:
@@ -133,22 +149,42 @@ def getCase():
 def loadCase(cases):
     printWelcomeScreen()
     casesNumbers = functions.getCasesNumbers()
+    casenr = None
+
     print ' Following cases are found:\n'
+
     while True:
         for case in cases:
             print(' {0}: {1}'.format(case[0], case[1]))
         choice = int(input('\n Select case: '))
         if choice in casesNumbers:
-            global casenr
-            casenr = choice
-            return casenr
+            details = getCaseDetails(choice)
+            if details:
+                break
         else:
             print '\n Wrong input, try again!\n'
+
+    return casenr
+
+
+def getCaseDetails(ID):
+    result = False
+
+    try:
+        global casenr
+        global casename
+        casenr = ID
+        casename = functions.getCaseName(str(ID))
+        result = True
+    except:
+        print ' [ERROR]: Cannot get case details.'
+
+    return result
 
 
 def menu():
     printWelcomeScreen()
-    print ' Welcome ' + str(user) + ',\n Casenumber: ' + str(casenr)
+    print ' Welcome in the menu!'
 
 
 def signal_handler(signal, frame):
