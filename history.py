@@ -4,7 +4,7 @@ import os
 import os.path
 
 # Input name for the machine
-name = input("Username of the PC required: ")
+name = raw_input("Username of the PC required: ")
 
 # Simple menu printing the different options
 print("\n" + "Make a choice: " + "\n"  + "1: Google Chrome\n" + "2: Internet Explorer\n" + "3: Firefox" + "\n" + "0: Exit program" + "\n")
@@ -13,13 +13,13 @@ print("\n" + "Make a choice: " + "\n"  + "1: Google Chrome\n" + "2: Internet Exp
 correct = False
 while not correct:
     try:
-        browserInput = int(input("Which browser history would you like to retrieve? "))
+        browserInput = int(raw_input("Which browser history would you like to retrieve? "))
         correct = True
     except ValueError:
         print("Invalid value, please pick a number from the list")
 
 # Destination folder for the file to be transfered, if the folder does not exists, it will create one.
-dest = input("Destination folder: ")
+dest = raw_input("Destination folder: ")
 if not os.path.exists(dest):
     os.mkdir(dest)
 
