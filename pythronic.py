@@ -15,7 +15,7 @@ import functions
 opeSys      = False
 opeSysSlash = False
 user        = False
-case        = False
+casenr      = False
 
 
 def main():
@@ -74,7 +74,7 @@ def login():
     authUser = username
 
     while (functions.checkLogin(username, password)):
-        print ('\n Login failed, try again: \n')
+        print ("\n Login failed, try again: \n")
         username = input(" Username: ")
         password = input(" Password: ")
         if not functions.checkLogin(username, password):
@@ -85,14 +85,31 @@ def login():
     return user
 
 
+def newCase():
+    printWelcomeScreen()
+    while True:
+        print (" Creating new case\n")
+        name = input(" Enter name case: ")
+        desc = input(" Enter description case: ")
+        if name.isalpha():
+            if functions.createCase(name, desc, user):
+                print (" Case succesfully created.")
+                return True
+        else:
+            print ("\n [Error]: Name can only be alphabetic.\n")
+
+
 def getCase():
     printWelcomeScreen()
     while True:
-        print (' 1. New case\n 2. Load case')
+        print (" 1. New case\n 2. Load case")
         choice = int(input('\n Make a choice: '))
         if choice == 1:
-            print (" You entered new case!")
-            break
+            new = newCase()
+            if new:
+                break
+            else:
+                print ("\n Error while creating new case")
         elif choice == 2:
             cases = functions.getCases()
             if len(cases) > 0:
@@ -113,16 +130,16 @@ def loadCase(cases):
             print(' {0}: {1}'.format(case[0], case[1]))
         choice = int(input('\n Select case: '))
         if choice in casesNumbers:
-            global case
-            case = choice
-            return case
+            global casenr
+            casenr = choice
+            return casenr
         else:
             print ("\n Wrong input, try again!\n")
 
 
 def menu():
     printWelcomeScreen()
-    print (" Welcome ", user, ",\n\n Your casenumber: ", case)
+    print (" Welcome ", user, ",\n\n Your casenumber: ", casenr)
 
 
 if __name__ == "__main__":
