@@ -121,14 +121,16 @@ def checkCaseExist(name):
 
 
 def getCasesNumbers():
-    casesNumbers = None
+    casesNumbers = []
 
     try:
-        db = sqlite3.connect("db/pythronic.db")
+        db = sqlite3.connect('db/pythronic.db')
         cursor = db.cursor()
         cases = cursor.execute("SELECT id FROM cases \
                                 WHERE deleted = '0'")
-        casesNumbers = cases.fetchall()
+        cases = cases.fetchall()
+        for case in cases:
+            casesNumbers.append(case[0])
     except:
         print ' [ERROR]: Error while getting the case numbers'
 
@@ -138,16 +140,40 @@ def getCasesNumbers():
 def createCase(name, desc, user):
     result = False
 
-    if not checkCaseExist(name):
-        db = sqlite3.connect("db/pythronic.db")
+    try:
+        if not checkCaseExist(name):
+            db = sqlite3.connect('db/pythronic.db')
+            cursor = db.cursor()
+            cursor.execute('''INSERT INTO cases (name, description, owner, created_at, deleted)
+                              VALUES (?,?,?,?,?)''', (
+                              name, desc, user, time.strftime("%Y-%m-%d"), '0'))
+            db.commit()
+            result = True
+        else:
+            print '\n [ERROR]: Name case must be unique.\n'
+    except:
+        print '\n [ERROR]: Case cannot be created!\n'
+
+    return result
+
+
+def deleteCase(ID, operation):
+    result = False
+
+    try:
+        db = sqlite3.connect('db/pythronic.db')
         cursor = db.cursor()
-        cursor.execute('''INSERT INTO cases (name, description, owner, created_at, deleted)
-                          VALUES (?,?,?,?,?)''', (
-                          name, desc, user, time.strftime("%Y-%m-%d"), '0'))
+
+        if operation == 'y':
+            cursor.execute("UPDATE cases SET deleted = '1' WHERE id = '" + ID + "'")
+
+        if operation == 'p':
+            cursor.execute("DELETE FROM cases WHERE id = '" + ID + "'")
+
         db.commit()
         result = True
-    else:
-        print '\n [ERROR]: Name case must be unique.\n'
+    except:
+        print '\n [ERROR]: Case cannot be deleted!\n'
 
     return result
 

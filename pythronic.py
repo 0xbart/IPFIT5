@@ -21,6 +21,11 @@ casenr = None
 casename = None
 
 
+def __init__():
+    global user
+    user = 'bier!'
+
+
 def main():
     detectOs()
     startApplication()
@@ -155,18 +160,17 @@ def manageCase(cases, action):
     while True:
         for case in cases:
             print(' {0}: {1}'.format(case[0], case[1]))
-        choice = int(input('\n Select case: '))
+        choice = int(functions.askInput('\n Select case', 'i'))
         if choice in casesNumbers:
             details = getCaseDetails(choice)
             if action == 'select':
                 if details:
                     break
             elif action == 'delete':
-                question = ' [WARNING]: Deleting ' + casename + '. \
-                            Y = yes, P = permanently, other keys = abort'
+                question = ' [WARNING]: Deleting ' + casename + '. Y = yes, P = permanently, other keys = abort'
                 confirm = functions.askInput(question, 's')
                 if confirm.lower() == 'y' or confirm.lower() == 'p':
-                    functions.deleteCase(choice, confirm)
+                    functions.deleteCase(choice, confirm.lower())
                 getCase()
         else:
             print '\n Wrong input, try again!\n'
