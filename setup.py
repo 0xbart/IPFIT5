@@ -13,6 +13,8 @@ import sqlite3
 import functions
 
 
+# START DEFAULT DATABASE
+
 def createDatabase():
     print ' [INFO]: Pythronic setup executed! Please follow instructions.'
     db = None
@@ -32,8 +34,8 @@ def createDBTables(db):
         cursor = db.cursor()
         sql = ('''CREATE TABLE users (id INTEGER PRIMARY KEY,
                   name TEXT, pass TEXT, deleted INTEGER);
-                  CREATE TABLE logs (id INTEGER PRIMARY KEY,
-                  datetime TIMESTAMP, description TEXT);
+                  CREATE TABLE logs (id INTEGER PRIMARY KEY, ddate DATE,
+                  datetime TIMESTAMP, level TEXT, description TEXT);
                   CREATE TABLE cases (id INTEGER PRIMARY KEY,
                   name TEXT, description TEXT, owner TEXT,
                   created_at TIMESTAMP, deleted INTEGER)''')
@@ -54,6 +56,53 @@ def createDBUser(db):
         db.commit()
     except:
         print ' [Error]: User cannot be created!'
+
+# END DEFAULT DATABASE
+# START CASE DATABASE
+
+def createCaseDatabase(name, description):
+    result = False
+    db = None
+    try:
+        db = sqlite3.connect('db/cases/'+ name +'.db')
+        if createCaseDBTables(db):
+            if createCaseDBValue(db, name, description):
+                result = True
+    except e:
+        print ' [ERROR] Database couldn\'t created succesfully.'
+    finally:
+        if db:
+            db.close()
+            return result
+
+
+def createCaseDBTables(db):
+    result = False
+
+    try:
+        cursor = db.cursor()
+        sql = ('''CREATE TABLE general (id INTEGER PRIMARY KEY,
+                  name TEXT, description TEXT, created_at TIMESTAMP);
+                  CREATE TABLE evidences (id INTEGER PRIMARY KEY, name TEXT,
+                  description TEXT, deleted INTEGER);''')
+        db.executescript(sql)
+        result = True
+    except:
+        print ' [Error]: Tables couldn\'t be created.\n'
+
+    return result
+
+
+def createCaseDBValue(db, name, description):
+    try:
+        cursor = db.cursor()
+        cursor.execute('''INSERT INTO general (name, description, created_at)
+            VALUES (?,?,?)''', (name, description, time.strftime("%Y-%m-%d %H:%M:%S")))
+        db.commit()
+    except:
+        print ' [Error]: Value cannot be created!'
+
+# END CASE DATABASE
 
 
 if __name__ == '__main__':

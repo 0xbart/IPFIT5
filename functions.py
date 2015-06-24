@@ -63,15 +63,20 @@ def askInput(message, type):
 
 
 def checkLogin(username, password):
-    db = sqlite3.connect('db/pythronic.db')
-    cursor = db.cursor()
-    countRows = cursor.execute("SELECT EXISTS(SELECT 1 FROM users WHERE name = '" + username + "'\
-                                AND pass = '" + getHash(password) + "');")
+    result = False
 
-    if countRows.fetchone()[0] == 1:
-        return True
-    else:
-        return False
+    try:
+        db = sqlite3.connect('db/pythronic.db')
+        cursor = db.cursor()
+        countRows = cursor.execute("SELECT EXISTS(SELECT 1 FROM users WHERE name = '" + username + "'\
+                                    AND pass = '" + getHash(password) + "');")
+
+        if countRows.fetchone()[0] == 1:
+            result = True
+    except:
+        print ' [ERROR]: Connection with the database isn\'t possible at this moment.'
+
+    return result
 
 
 def getCases():
@@ -190,6 +195,23 @@ def deleteCase(ID, operation):
         result = True
     except:
         print '\n [ERROR]: Case cannot be deleted!\n'
+
+    return result
+
+
+def appendLog(level, message):
+    result = False
+
+    try:
+        db = sqlite3.connect('db/pythronic.db')
+        cursor = db.cursor()
+        cursor.execute('''INSERT INTO logs (ddate, datetime, level, description)
+                          VALUES (?,?,?,?)''', (
+                          time.strftime("%Y-%m-%d"), time.strftime("%Y-%m-%d %H:%M:%S"), level, message))
+        db.commit()
+        result = True
+    except:
+        print '\n [ERROR]: Log entry cannot be writed into the database.'
 
     return result
 

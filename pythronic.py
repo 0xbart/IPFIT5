@@ -40,6 +40,7 @@ def startApplication():
         print (' [ERROR]: Database doesn\'t exist; executing setup.\n')
         setup.createDatabase()
 
+    functions.appendLog('i', 'Application Pythronic started.')
     printWelcomeScreen()
 
 
@@ -171,7 +172,7 @@ def manageCase(cases, action):
                 confirm = functions.askInput(question, 's')
                 if confirm.lower() == 'y' or confirm.lower() == 'p':
                     functions.deleteCase(str(choice), confirm.lower())
-                clearCaseDetails()    
+                clearCaseDetails()
                 getCase()
         else:
             print '\n Wrong input, try again!\n'
