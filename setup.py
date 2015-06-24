@@ -97,7 +97,7 @@ def createCaseDBValue(db, name, description):
     try:
         cursor = db.cursor()
         cursor.execute('''INSERT INTO general (name, description, created_at)
-            VALUES (?,?,?)''', (name, description, time.strftime("%Y-%m-%d %H:%M:%S")))
+            VALUES (?,?,?)''', (name, description, '24-04-2014 10:12:34'))
         db.commit()
     except:
         print ' [Error]: Value cannot be created!'

@@ -14,6 +14,7 @@ import sqlite3
 import hashlib
 import signal
 import sys
+import setup
 
 
 def getHash(x):
@@ -169,7 +170,8 @@ def createCase(name, desc, user):
                               VALUES (?,?,?,?,?)''', (
                               name, desc, user, time.strftime("%Y-%m-%d"), '0'))
             db.commit()
-            result = True
+            if setup.createCaseDatabase(name, desc):
+                result = True
         else:
             print '\n [ERROR]: Name case must be unique.\n'
     except:
