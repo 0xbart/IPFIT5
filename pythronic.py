@@ -35,9 +35,9 @@ def main():
 
 
 def startApplication():
-    if not os.path.isfile('./db/pythronic.db'):
+    if not os.path.isfile('db' + functions.getOsSlash() + 'pythronic.db'):
         printWelcomeScreen()
-        print (' [ERROR]: Database doesn\'t exist; executing setup.\n')
+        print (' []: Database doesn\'t exist; executing setup.\n')
         setup.createDatabase()
 
     functions.appendLog('i', 'Application Pythronic started.')
@@ -107,6 +107,7 @@ def login():
 
 
 def newCase():
+    result = False
     printWelcomeScreen()
     while True:
         print ' Creating new case\n'
@@ -115,10 +116,11 @@ def newCase():
         if name.isalpha():
             if functions.createCase(name, desc, user):
                 print (' [Info]: Case succesfully created.')
-                return functions.getCaseID(name)
+                result = functions.getCaseID(name)
+                break
         else:
-            print '\n [Error]: Name can only be alphabetic.\n'
-    return False
+            print '\n []: Name can only be alphabetic.\n'
+    return result
 
 
 def getCase():
@@ -133,7 +135,7 @@ def getCase():
                 if details:
                     break
             else:
-                print '\n Error while creating new case'
+                print '\n  while creating new case'
         elif choice == 2 or choice == 3:
             cases = functions.getCases()
             if len(cases) > 0:
@@ -172,8 +174,9 @@ def manageCase(cases, action):
                 confirm = functions.askInput(question, 's')
                 if confirm.lower() == 'y' or confirm.lower() == 'p':
                     functions.deleteCase(str(choice), confirm.lower())
-                clearCaseDetails()
-                getCase()
+                    clearCaseDetails()
+                    printWelcomeScreen()
+                    break
         else:
             print '\n Wrong input, try again!\n'
 
@@ -190,7 +193,7 @@ def getCaseDetails(ID):
         casename = functions.getCaseName(str(ID))
         result = True
     except:
-        print ' [ERROR]: Cannot get case details.'
+        print ' []: Cannot get case details.'
 
     return result
 

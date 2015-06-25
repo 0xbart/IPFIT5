@@ -11,6 +11,7 @@
 """
 import sqlite3
 import functions
+import os
 
 
 # START DEFAULT DATABASE
@@ -19,10 +20,10 @@ def createDatabase():
     print ' [INFO]: Pythronic setup executed! Please follow instructions.'
     db = None
     try:
-        db = sqlite3.connect('db/pythronic.db')
+        db = sqlite3.connect(‘db’+ functions.getOsSlash() +'pythronic.db')
         createDBTables(db)
         createDBUser(db)
-    except e:
+    except:
         print ' [ERROR] Database couldn\'t created succesfully.'
     finally:
         if db:
@@ -64,7 +65,7 @@ def createCaseDatabase(name, description):
     result = False
     db = None
     try:
-        db = sqlite3.connect('db/cases/'+ name +'.db')
+        db = sqlite3.connect('db' + functions.getOsSlash() + 'cases' + functions.getOsSlash() + name + '.db')
         if createCaseDBTables(db):
             if createCaseDBValue(db, name, description):
                 result = True
@@ -94,13 +95,30 @@ def createCaseDBTables(db):
 
 
 def createCaseDBValue(db, name, description):
+    result = False
+
     try:
         cursor = db.cursor()
         cursor.execute('''INSERT INTO general (name, description, created_at)
             VALUES (?,?,?)''', (name, description, '24-04-2014 10:12:34'))
         db.commit()
+        result = True
     except:
         print ' [Error]: Value cannot be created!'
+
+    return result
+
+
+def removeCaseDatabase(ID):
+    result = False
+    try:
+        name = functions.getCaseName(str(ID))
+        os.remove('db' + functions.getOsSlash() + 'cases' + functions.getOsSlash() + name + '.db')
+        result = True
+    except:
+        print ' [ERROR]: database cannot be removed.'
+
+    return result
 
 # END CASE DATABASE
 
