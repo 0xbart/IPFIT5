@@ -32,24 +32,14 @@ def askInput(message, type):
             except:
                 print '\n Wrong input, try again. \n'
         elif type == 'i':
-            """
-            DIT VERBETEREN, CATCH DE Q!
-
-            while True:
-            value = raw_input('Value between 0 and 100:')
             try:
-               value = int(value)
-            except ValueError:
-               print 'Valid number, please'
-               continue
-            if 0 <= value <= 100:
-               break
-            else:
-               print 'Valid range, please: 0-100'
+                var = raw_input(" " + message + ": ")
 
-            """
-            try:
-                var = int(input(' ' + message + ': '))
+                # Send q or h back for help or quit function!
+                if var == 'q' or var == 'h':
+                    break
+
+                var = int(var)
                 break
             except:
                 print '\n Wrong input, try again. \n'
@@ -85,7 +75,6 @@ def checkLogin(username, password):
         cursor = db.cursor()
         countRows = cursor.execute("SELECT EXISTS(SELECT 1 FROM users WHERE name = '" + username + "'\
                                     AND pass = '" + getHash(password) + "');")
-
         if countRows.fetchone()[0] == 1:
             result = True
     except:

@@ -13,6 +13,7 @@ import setup
 import sys
 import functions
 import signal
+import webbrowser
 
 opeSys = None
 opeSysSlash = None
@@ -22,8 +23,8 @@ casename = None
 
 
 def __init__():
-    global user
-    user = 'bier!'
+    # Refactor
+    pass
 
 
 def main():
@@ -126,9 +127,11 @@ def newCase():
 def getCase():
     printWelcomeScreen()
     while True:
-        print ' 1. New case\n 2. Load case\n 3. Delete case\n'
+        print ' 1. New case\n 2. Load case\n 3. Delete case\n\n h. Open FAQ\n q. Quit Pythronic\n'
         choice = functions.askInput('Make a choice', 'i')
-        if choice == 1:
+        if choice == 'q' or choice == 'h':
+            globalOperators(choice)
+        elif choice == 1:
             new = newCase()
             if new:
                 details = getCaseDetails(new)
@@ -163,21 +166,24 @@ def manageCase(cases, action):
     while True:
         for case in cases:
             print(' {0}: {1}'.format(case[0], case[1]))
-        choice = int(functions.askInput('\n Select case', 'i'))
-        if choice in casesNumbers:
+        choice = functions.askInput('\n Select case', 'i')
+        if choice == 'q' or choice == 'h':
+            globalOperators(choice)
+        elif choice in casesNumbers:
             details = getCaseDetails(choice)
             if action == 'select':
                 if details:
+                    casenr = choice
                     break
             elif action == 'delete':
-                question = '[WARNING]: Deleting `' + casename + '`. \
-                            Y = yes, P = permanently, other keys = abort'
+                question = '[WARNING]: Deleting `' + casename + '`? '
+                question += 'Y = yes, P = permanently, other keys = abort'
                 confirm = functions.askInput(question, 's')
                 if confirm.lower() == 'y' or confirm.lower() == 'p':
                     functions.deleteCase(str(choice), confirm.lower())
-                    clearCaseDetails()
-                    printWelcomeScreen()
-                    break
+                clearCaseDetails()
+                printWelcomeScreen()
+                break
         else:
             print '\n Wrong input, try again!\n'
 
@@ -211,6 +217,15 @@ def clearCaseDetails():
 def menu():
     printWelcomeScreen()
     print ' Welcome in the menu!'
+
+
+def globalOperators(choice):
+    if choice == 'h':
+        print ' [INFO]: FAQ opened in browser.'
+        FAQfile = 'FAQ' + functions.getOsSlash() + 'index.html'
+        webbrowser.open('file://' + os.path.realpath(FAQfile))
+    elif choice == 'q':
+        sys.exit(0)
 
 
 def signal_handler(signal, frame):

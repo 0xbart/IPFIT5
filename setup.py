@@ -12,15 +12,16 @@
 import sqlite3
 import functions
 import os
-
+import time
 
 # START DEFAULT DATABASE
+
 
 def createDatabase():
     print ' [INFO]: Pythronic setup executed! Please follow instructions.'
     db = None
     try:
-        db = sqlite3.connect(‘db’ + functions.getOsSlash() + 'pythronic.db')
+        db = sqlite3.connect('db' + functions.getOsSlash() + 'pythronic.db')
         createDBTables(db)
         createDBUser(db)
     except:
@@ -102,7 +103,8 @@ def createCaseDBValue(db, name, description):
     try:
         cursor = db.cursor()
         cursor.execute('''INSERT INTO general (name, description, created_at)
-            VALUES (?,?,?)''', (name, description, '24-04-2014 10:12:34'))
+            VALUES (?,?,?)''', (
+            name, description, time.strftime("%Y-%m-%d %H:%M:%S")))
         db.commit()
         result = True
     except:
