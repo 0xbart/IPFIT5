@@ -20,7 +20,7 @@ def createDatabase():
     print ' [INFO]: Pythronic setup executed! Please follow instructions.'
     db = None
     try:
-        db = sqlite3.connect(‘db’+ functions.getOsSlash() +'pythronic.db')
+        db = sqlite3.connect(‘db’ + functions.getOsSlash() + 'pythronic.db')
         createDBTables(db)
         createDBUser(db)
     except:
@@ -61,11 +61,13 @@ def createDBUser(db):
 # END DEFAULT DATABASE
 # START CASE DATABASE
 
+
 def createCaseDatabase(name, description):
     result = False
     db = None
     try:
-        db = sqlite3.connect('db' + functions.getOsSlash() + 'cases' + functions.getOsSlash() + name + '.db')
+        db = sqlite3.connect('db' + functions.getOsSlash() + 'cases' +
+                             functions.getOsSlash() + name + '.db')
         if createCaseDBTables(db):
             if createCaseDBValue(db, name, description):
                 result = True
@@ -113,7 +115,8 @@ def removeCaseDatabase(ID):
     result = False
     try:
         name = functions.getCaseName(str(ID))
-        os.remove('db' + functions.getOsSlash() + 'cases' + functions.getOsSlash() + name + '.db')
+        os.remove('db' + functions.getOsSlash() + 'cases' +
+                  functions.getOsSlash() + name + '.db')
         result = True
     except:
         print ' [ERROR]: database cannot be removed.'

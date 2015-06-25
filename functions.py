@@ -89,7 +89,7 @@ def checkLogin(username, password):
         if countRows.fetchone()[0] == 1:
             result = True
     except:
-        print ' [ERROR]: Connection with the database isn\'t possible at this moment.'
+        print ' [ERROR]: Connection with the database failed.'
 
     return result
 
@@ -182,7 +182,8 @@ def createCase(name, desc, user):
             cursor = db.cursor()
             cursor.execute('''INSERT INTO cases (name, description, owner, created_at, deleted)
                               VALUES (?,?,?,?,?)''', (
-                              name, desc, user, time.strftime("%Y-%m-%d"), '0'))
+                              name, desc, user,
+                              time.strftime("%Y-%m-%d"), '0'))
             db.commit()
             if setup.createCaseDatabase(name, desc):
                 result = True
@@ -202,7 +203,8 @@ def deleteCase(ID, operation):
         cursor = db.cursor()
 
         if operation == 'y':
-            cursor.execute("UPDATE cases SET deleted = '1' WHERE id = '" + ID + "'")
+            cursor.execute("UPDATE cases SET deleted = '1' \
+                            WHERE id = '" + ID + "'")
 
         if operation == 'p':
             cursor.execute("DELETE FROM cases WHERE id = '" + ID + "'")
@@ -224,7 +226,8 @@ def appendLog(level, message):
         cursor = db.cursor()
         cursor.execute('''INSERT INTO logs (ddate, datetime, level, description)
                           VALUES (?,?,?,?)''', (
-                          time.strftime("%Y-%m-%d"), time.strftime("%Y-%m-%d %H:%M:%S"), level, message))
+                          time.strftime("%Y-%m-%d"),
+                          time.strftime("%Y-%m-%d %H:%M:%S"), level, message))
         db.commit()
         result = True
     except:

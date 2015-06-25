@@ -170,7 +170,8 @@ def manageCase(cases, action):
                 if details:
                     break
             elif action == 'delete':
-                question = '[WARNING]: Deleting `' + casename + '`. Y = yes, P = permanently, other keys = abort'
+                question = '[WARNING]: Deleting `' + casename + '`. \
+                            Y = yes, P = permanently, other keys = abort'
                 confirm = functions.askInput(question, 's')
                 if confirm.lower() == 'y' or confirm.lower() == 'p':
                     functions.deleteCase(str(choice), confirm.lower())
