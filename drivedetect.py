@@ -2,8 +2,7 @@ __author__ = 'Michael'
 
 import psutil
 
-print ("What do you want to do?")
-options = int(input("1: Show drive info" + "\n"))
+print ("The following drives have been detected:")
 
 def driveinfolinux():
 #Cross platform schijf info
@@ -16,5 +15,4 @@ def driveinfolinux():
         print ("Drive",x, ":" + num)
 
 #Call function
-if options == 1:
-    driveinfolinux()
+driveinfolinux()

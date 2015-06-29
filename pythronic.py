@@ -13,12 +13,19 @@ import setup
 import sys
 import functions
 import signal
+import webbrowser
 
-opeSys      = None
+opeSys = None
 opeSysSlash = None
-user        = None
-casenr      = None
-casename    = None
+user = None
+casenr = None
+casename = None
+
+
+def __init__():
+    # Refactor
+    pass
+
 
 def main():
     detectOs()
@@ -29,13 +36,13 @@ def main():
 
 
 def startApplication():
-    if not os.path.isfile('./db/pythronic.db'):
+    if not os.path.isfile('db' + functions.getOsSlash() + 'pythronic.db'):
         printWelcomeScreen()
-        print (' [ERROR]: Database doesn\'t exist; executing setup.\n')
+        print (' []: Database doesn\'t exist; executing setup.\n')
         setup.createDatabase()
 
+    functions.appendLog('i', 'Application Pythronic started.')
     printWelcomeScreen()
-
 
 
 def detectOs():
@@ -58,14 +65,16 @@ def detectOs():
 def printWelcomeScreen():
     clearScreen()
     message = '\n'
-    message += ' Welcome by Pytronic! \n\n'
+    message += ' WELCOME BY PYTHRONIC! \n\n'
 
     if user:
         message += ' Welcome ' + str(user) + '.\n'
-    elif str(casename) == None:
-        message += ' Casenumber ' + str(casenr) + ', Casename ' + str(casename)
 
-    message += '\n ############################\n'
+    if casenr:
+        message += ' Casenumber: ' + str(casenr) + '.\n'
+        message += ' Casename: ' + str(casename) + '.\n'
+
+    message += '\n ###########################################\n\n'
 
     print message
 
@@ -99,6 +108,7 @@ def login():
 
 
 def newCase():
+    result = False
     printWelcomeScreen()
     while True:
         print ' Creating new case\n'
@@ -107,46 +117,46 @@ def newCase():
         if name.isalpha():
             if functions.createCase(name, desc, user):
                 print (' [Info]: Case succesfully created.')
-                return functions.getCaseID(name)
+                result = functions.getCaseID(name)
+                break
         else:
-            print '\n [Error]: Name can only be alphabetic.\n'
-    return False
+            print '\n []: Name can only be alphabetic.\n'
+    return result
 
 
 def getCase():
     printWelcomeScreen()
     while True:
-        print ' 1. New case\n 2. Load case\n 3. Delete case\n'
+        print ' 1. New case\n 2. Load case\n 3. Delete case\n\n h. Open FAQ\n q. Quit Pythronic\n'
         choice = functions.askInput('Make a choice', 'i')
-        if choice == 1:
+        if choice == 'q' or choice == 'h':
+            globalOperators(choice)
+        elif choice == 1:
             new = newCase()
             if new:
                 details = getCaseDetails(new)
                 if details:
                     break
             else:
-                print '\n Error while creating new case'
+                print '\n  while creating new case'
         elif choice == 2 or choice == 3:
             cases = functions.getCases()
             if len(cases) > 0:
                 if choice == 2:
-                    case = loadCase(cases)
+                    case = manageCase(cases, 'select')
                     if case:
                         break
                 elif choice == 3:
-                    print '\n Feature doensnt work at this moment!'
-                    # deleteCase(cases)
-                    # TODO
-                    # TODO
-                    # TODO
-                    # break
+                    case = manageCase(cases, 'delete')
+                    if case:
+                        print ' [INFO]: Case (nr ' + case + ') deleted!'
             else:
                 print '\n No cases found in the database.\n'
         else:
             print '\n Wrong input, try again!\n'
 
 
-def loadCase(cases):
+def manageCase(cases, action):
     printWelcomeScreen()
     casesNumbers = functions.getCasesNumbers()
     casenr = None
@@ -156,10 +166,23 @@ def loadCase(cases):
     while True:
         for case in cases:
             print(' {0}: {1}'.format(case[0], case[1]))
-        choice = int(input('\n Select case: '))
-        if choice in casesNumbers:
+        choice = functions.askInput('\n Select case', 'i')
+        if choice == 'q' or choice == 'h':
+            globalOperators(choice)
+        elif choice in casesNumbers:
             details = getCaseDetails(choice)
-            if details:
+            if action == 'select':
+                if details:
+                    casenr = choice
+                    break
+            elif action == 'delete':
+                question = '[WARNING]: Deleting `' + casename + '`? '
+                question += 'Y = yes, P = permanently, other keys = abort'
+                confirm = functions.askInput(question, 's')
+                if confirm.lower() == 'y' or confirm.lower() == 'p':
+                    functions.deleteCase(str(choice), confirm.lower())
+                clearCaseDetails()
+                printWelcomeScreen()
                 break
         else:
             print '\n Wrong input, try again!\n'
@@ -177,14 +200,32 @@ def getCaseDetails(ID):
         casename = functions.getCaseName(str(ID))
         result = True
     except:
-        print ' [ERROR]: Cannot get case details.'
+        print ' []: Cannot get case details.'
 
     return result
+
+
+def clearCaseDetails():
+    global casenr
+    global casename
+    casenr = None
+    caseName = None
+
+    return True
 
 
 def menu():
     printWelcomeScreen()
     print ' Welcome in the menu!'
+
+
+def globalOperators(choice):
+    if choice == 'h':
+        print ' [INFO]: FAQ opened in browser.'
+        FAQfile = 'FAQ' + functions.getOsSlash() + 'index.html'
+        webbrowser.open('file://' + os.path.realpath(FAQfile))
+    elif choice == 'q':
+        sys.exit(0)
 
 
 def signal_handler(signal, frame):

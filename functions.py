@@ -9,10 +9,13 @@
 
     FUNCTIONS ONLY SCRIPT
 """
+from sys import platform as _platform
 import time
 import sqlite3
 import hashlib
 import signal
+import sys
+import setup
 
 
 def getHash(x):
@@ -24,13 +27,19 @@ def askInput(message, type):
     while True:
         if type == 's':
             try:
-                var = raw_input(" "+ message +": ")
+                var = raw_input(" " + message + ": ")
                 break
             except:
                 print '\n Wrong input, try again. \n'
         elif type == 'i':
             try:
-                var = int(input(' '+ message +': '))
+                var = raw_input(" " + message + ": ")
+
+                # Send q or h back for help or quit function!
+                if var == 'q' or var == 'h':
+                    break
+
+                var = int(var)
                 break
             except:
                 print '\n Wrong input, try again. \n'
@@ -40,31 +49,49 @@ def askInput(message, type):
     return var
 
 
+def getOsSlash():
+    slash = None
+
+    if _platform == 'linux' or _platform == 'linux2':
+        slash = '/'
+    elif _platform == 'darwin':
+        slash = '/'
+    elif _platform == 'win32':
+        slash = '\\'
+
+    return slash
+
+
 #
 # ONDERSTAAND ZIJN FUCTIES MET CONNECTIES NAAR DE DATABASE!
 #
 
 
 def checkLogin(username, password):
-    db = sqlite3.connect('db/pythronic.db')
-    cursor = db.cursor()
-    countRows = cursor.execute("SELECT EXISTS(SELECT 1 FROM users WHERE name = '" + username + "'\
-                                AND pass = '" + getHash(password) + "');")
+    result = False
 
-    if countRows.fetchone()[0] == 1:
-        return True
-    else:
-        return False
+    try:
+        db = sqlite3.connect('db' + getOsSlash() + 'pythronic.db')
+        cursor = db.cursor()
+        countRows = cursor.execute("SELECT EXISTS(SELECT 1 FROM users WHERE name = '" + username + "'\
+                                    AND pass = '" + getHash(password) + "');")
+        if countRows.fetchone()[0] == 1:
+            result = True
+    except:
+        print ' [ERROR]: Connection with the database failed.'
+
+    return result
 
 
 def getCases():
     cases = None
 
     try:
-        db = sqlite3.connect('db/pythronic.db')
+        db = sqlite3.connect('db' + getOsSlash() + 'pythronic.db')
         cursor = db.cursor()
-        result = cursor.execute("SELECT id, name FROM cases WHERE deleted = '0'")
-        cases = result.fetchall()
+        rows = cursor.execute("SELECT id, name FROM cases \
+                               WHERE deleted = '0'")
+        cases = rows.fetchall()
     except:
         print ' [Error]: while getting cases of database.'
 
@@ -75,9 +102,10 @@ def getCaseID(name):
     ID = False
 
     try:
-        db = sqlite3.connect('db/pythronic.db')
+        db = sqlite3.connect('db' + getOsSlash() + 'pythronic.db')
         cursor = db.cursor()
-        case = cursor.execute("SELECT id FROM cases WHERE name = '"+ name + "'")
+        case = cursor.execute("SELECT id FROM cases \
+                               WHERE name = '" + name + "'")
         ID = case.fetchone()[0]
     except:
         print ' [Error]: Error while getting the case ID.'
@@ -89,9 +117,10 @@ def getCaseName(ID):
     name = None
 
     try:
-        db = sqlite3.connect('db/pythronic.db')
+        db = sqlite3.connect('db' + getOsSlash() + 'pythronic.db')
         cursor = db.cursor()
-        case = cursor.execute("SELECT name FROM cases WHERE id = '"+ ID + "'")
+        case = cursor.execute("SELECT name FROM cases \
+                               WHERE id = '" + ID + "'")
         name = case.fetchone()[0]
     except:
         print ' [Error]: Error while getting the case name.'
@@ -103,9 +132,10 @@ def checkCaseExist(name):
     existing = False
 
     try:
-        db = sqlite3.connect('db/pythronic.db')
+        db = sqlite3.connect('db' + getOsSlash() + 'pythronic.db')
         cursor = db.cursor()
-        countRows = cursor.execute("SELECT EXISTS(SELECT 1 FROM cases WHERE name = '" + name + "');")
+        countRows = cursor.execute("SELECT EXISTS(SELECT 1 FROM cases \
+                                    WHERE name = '" + name + "');")
 
         if countRows.fetchone()[0] == 1:
             existing = True
@@ -116,13 +146,16 @@ def checkCaseExist(name):
 
 
 def getCasesNumbers():
-    casesNumbers = None
+    casesNumbers = []
 
     try:
-        db = sqlite3.connect("db/pythronic.db")
+        db = sqlite3.connect('db' + getOsSlash() + 'pythronic.db')
         cursor = db.cursor()
-        cases = cursor.execute("SELECT id FROM cases WHERE deleted = '0'")
-        casesNumbers = cases.fetchall()
+        cases = cursor.execute("SELECT id FROM cases \
+                                WHERE deleted = '0'")
+        cases = cases.fetchall()
+        for case in cases:
+            casesNumbers.append(case[0])
     except:
         print ' [ERROR]: Error while getting the case numbers'
 
@@ -132,17 +165,68 @@ def getCasesNumbers():
 def createCase(name, desc, user):
     result = False
 
-    if not checkCaseExist(name):
-        db = sqlite3.connect("db/pythronic.db")
-        cursor = db.cursor()
-        cursor.execute('''INSERT INTO cases (name, description, owner, created_at, deleted) VALUES (?,?,?,?,?)''',
-                          (name, desc, user, time.strftime("%Y-%m-%d"), '0'))
-        db.commit()
-        result = True
-    else:
-        print '\n [ERROR]: Name case must be unique.\n'
+    try:
+        if not checkCaseExist(name):
+            db = sqlite3.connect('db' + getOsSlash() + 'pythronic.db')
+            cursor = db.cursor()
+            cursor.execute('''INSERT INTO cases (name, description, owner, created_at, deleted)
+                              VALUES (?,?,?,?,?)''', (
+                              name, desc, user,
+                              time.strftime("%Y-%m-%d"), '0'))
+            db.commit()
+            if setup.createCaseDatabase(name, desc):
+                result = True
+        else:
+            print '\n [ERROR]: Name case must be unique.\n'
+    except:
+        print '\n [ERROR]: Case cannot be created!\n'
 
     return result
+
+
+def deleteCase(ID, operation):
+    result = False
+
+    try:
+        db = sqlite3.connect('db' + getOsSlash() + 'pythronic.db')
+        cursor = db.cursor()
+
+        if operation == 'y':
+            cursor.execute("UPDATE cases SET deleted = '1' \
+                            WHERE id = '" + ID + "'")
+
+        if operation == 'p':
+            cursor.execute("DELETE FROM cases WHERE id = '" + ID + "'")
+            setup.removeCaseDatabase(ID)
+
+        db.commit()
+        result = True
+    except:
+        print '\n [ERROR]: Case cannot be deleted!\n'
+
+    return result
+
+
+def appendLog(level, message):
+    result = False
+
+    try:
+        db = sqlite3.connect('db' + getOsSlash() + 'pythronic.db')
+        cursor = db.cursor()
+        cursor.execute('''INSERT INTO logs (ddate, datetime, level, description)
+                          VALUES (?,?,?,?)''', (
+                          time.strftime("%Y-%m-%d"),
+                          time.strftime("%Y-%m-%d %H:%M:%S"), level, message))
+        db.commit()
+        result = True
+    except:
+        print '\n [ERROR]: Log entry cannot be writed into the database.'
+
+    return result
+
+
+def signal_handler(signal, frame):
+    sys.exit(0)
 
 
 if __name__ == '__main__':
