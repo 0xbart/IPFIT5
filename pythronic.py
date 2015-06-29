@@ -65,8 +65,27 @@ def detectOs():
 
 def printWelcomeScreen():
     clearScreen()
-    message = '\n'
-    message += ' WELCOME TO PYTHRONIC! \n\n'
+
+    cow1 = ' ---------------------- '
+    cow2 = '  WELCOME TO PYTHRONIC '
+    cow3 = ' ---------------------- '
+    cow4 = '             \   ^__^'
+    cow5 = '              \  (oo)\_______'
+    cow6 = '                 (__)\       )\/\\'
+    cow7 = '                     ||----w |'
+    cow8 = '                     ||     ||'
+
+    print ''
+    print cow1
+    print cow2
+    print cow3
+    print cow4
+    print cow5
+    print cow6
+    print cow7
+    print cow8
+
+    message = ''
 
     if user:
         message += ' Welcome ' + str(user) + '.\n'
@@ -75,7 +94,7 @@ def printWelcomeScreen():
         message += ' Casenumber: ' + str(casenr) + '.\n'
         message += ' Casename: ' + str(casename) + '.\n'
 
-    message += '\n ###########################################\n\n'
+    message += '\n #################################\n\n'
 
     print message
 
@@ -131,10 +150,17 @@ def newCase():
 def getCase():
     printWelcomeScreen()
     while True:
-        print ' 1. New case\n 2. Load case\n 3. Delete case\n 4. Manage users\n\n h. Open FAQ\n q. Quit Pythronic\n'
+        print ' 1. New case\n 2. Load case\n 3. Delete case\n 4. Manage users'
+        print '\n h. Open FAQ\n b. Log out\n q. Quit Pythronic\n\n'
         choice = functions.askInput('Make a choice', 'i')
         if choice == 'q' or choice == 'h':
             globalOperators(choice)
+        if choice == 'b':
+            clearUserDetails()
+            clearScreen()
+            print ' \n Succesfully logged out.\n\n'
+            login()
+            printWelcomeScreen()
         elif choice == 1:
             new = newCase()
             if new:
@@ -223,7 +249,7 @@ def manageUser(action):
                     if not str(choice) == str(userID):
                         username = functions.getUsername(str(choice))
                         question = '[WARNING]: Deleting `' + username + '`? '
-                        question += 'Y = yes, P = permanently, other keys = abort'
+                        question += 'Y = yes, P = permanently, other = abort'
                         confirm = functions.askInput(question, 's')
                         if confirm.lower() == 'y' or confirm.lower() == 'p':
                             functions.deleteUser(str(choice), confirm.lower())
@@ -262,7 +288,7 @@ def manageCase(cases, action):
                     break
             elif action == 'delete':
                 question = '[WARNING]: Deleting `' + casename + '`? '
-                question += 'Y = yes, P = permanently, other keys = abort'
+                question += 'Y = yes, P = permanently, other = abort'
                 confirm = functions.askInput(question, 's')
                 if confirm.lower() == 'y' or confirm.lower() == 'p':
                     functions.deleteCase(str(choice), confirm.lower())
@@ -285,7 +311,7 @@ def getCaseDetails(ID):
         casename = functions.getCaseName(str(ID))
         result = True
     except:
-        print ' []: Cannot get case details.'
+        print ' [ERROR]: Cannot get case details.'
 
     return result
 
@@ -299,9 +325,30 @@ def clearCaseDetails():
     return True
 
 
+def clearUserDetails():
+    global user
+    global userID
+    user = None
+    userID = None
+
+    return True
+
+
 def menu():
     printWelcomeScreen()
-    print ' Welcome in the menu!'
+    while True:
+        print ' 1. New evidence\n 2. Delete evidence\n 3. Start scan'
+        print ' 4. Generate report\n'
+        print ' h. Open FAQ\n b. Exit case\n q. Quit Pythronic\n\n'
+        choice = functions.askInput('Make a choice', 'i')
+        if choice == 'q' or choice == 'h':
+            globalOperators(choice)
+        elif choice == 'b':
+            clearCaseDetails()
+            getCase()
+            menu()
+        else:
+            print 'jeah'
 
 
 def globalOperators(choice):
