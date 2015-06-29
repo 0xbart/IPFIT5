@@ -22,9 +22,9 @@ def userinfo():
                         "Used virtual memory in Gb           " + str((mem.used/(math.pow(2,30)))),
                         "Available virtual memory in Gb:     " + str((mem.available/(math.pow(2,30))))
                         ]
-    except:
-        ImportError
-
+    except ImportError:
+		pass
+        
         #Get RAM and CPU name
     try:
         for i in hardwarelist:
