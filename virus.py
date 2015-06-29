@@ -4,7 +4,10 @@ import os
 import os.path
 import time
 import re
+import requests
 from virus_total_apis import PublicApi as VirusTotalPublicApi
+# pip install virustotal-api
+requests.packages.urllib3.disable_warnings()
 
 stepCount = 0  # Variable to count the files left
 hashList = []  # The hash list for VirusTotal
