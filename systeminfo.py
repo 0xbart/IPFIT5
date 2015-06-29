@@ -1,18 +1,36 @@
-__author__ = 'Michael'
-
 import getpass
 import socket
-import sysinfo
+import wmi
+import math
 import platform
-import psutil
+from psutil import virtual_memory
 
 def userinfo():
-#User info
-    print ("Network name:           ",  socket.gethostname())
-    print ("Username:               ",  getpass.getuser())
-    print ("System architecture:    ",  platform.machine())
-    print ("Operating system        ",  platform.platform(aliased=0, terse=0))
-    print ("Processor:              ",  platform.processor())
-    print ("Virtual memory:         ",  psutil.virtual_memory())
-    print ("Virtual memory:         ",  sysinfo.memory_available())
+    try:
+        mem = virtual_memory()
+        c = wmi.WMI()
+        for i in c.Win32_Processor ():
+            cputype = i.Name
+
+        hardwarelist = ["PC name:                            " + socket.gethostname(),
+                        "Username:                           " +  getpass.getuser() ,
+                        "System architecture:                " +  platform.machine(),
+                        "Operating system:                   " +  platform.platform(aliased=0, terse=0),
+                        "Processor name:                     " +  cputype,
+                        "Processor family:                   " +  platform.processor(),
+                        "Total virtual memory in Gb:         " + str((mem.total/(math.pow(2,30)))),
+                        "Used virtual memory in Gb           " + str((mem.used/(math.pow(2,30)))),
+                        "Available virtual memory in Gb:     " + str((mem.available/(math.pow(2,30))))
+                        ]
+    except ImportError:
+		pass
+        
+        #Get RAM and CPU name
+    try:
+        for i in hardwarelist:
+            print i
+    except:
+        pass
+
 userinfo()
+
