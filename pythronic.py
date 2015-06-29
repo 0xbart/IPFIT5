@@ -18,6 +18,7 @@ import webbrowser
 opeSys = None
 opeSysSlash = None
 user = None
+userID = None
 casenr = None
 casename = None
 
@@ -38,7 +39,7 @@ def main():
 def startApplication():
     if not os.path.isfile('db' + functions.getOsSlash() + 'pythronic.db'):
         printWelcomeScreen()
-        print (' []: Database doesn\'t exist; executing setup.\n')
+        print (' [INFO]: Database doesn\'t exist; executing setup.\n')
         setup.createDatabase()
 
     functions.appendLog('i', 'Application Pythronic started.')
@@ -65,7 +66,7 @@ def detectOs():
 def printWelcomeScreen():
     clearScreen()
     message = '\n'
-    message += ' WELCOME BY PYTHRONIC! \n\n'
+    message += ' WELCOME TO PYTHRONIC! \n\n'
 
     if user:
         message += ' Welcome ' + str(user) + '.\n'
@@ -92,7 +93,9 @@ def login():
     print ' Login first:\n'
 
     global user
+    global userID
     user = None
+    userID = None
 
     while True:
         username = functions.askInput('Enter username', 's')
@@ -100,6 +103,7 @@ def login():
 
         if functions.checkLogin(username, password):
             user = username
+            userID = functions.getUserID(username)
             break
         else:
             print '\n Login failed, try again. \n'
@@ -127,7 +131,7 @@ def newCase():
 def getCase():
     printWelcomeScreen()
     while True:
-        print ' 1. New case\n 2. Load case\n 3. Delete case\n\n h. Open FAQ\n q. Quit Pythronic\n'
+        print ' 1. New case\n 2. Load case\n 3. Delete case\n 4. Manage users\n\n h. Open FAQ\n q. Quit Pythronic\n'
         choice = functions.askInput('Make a choice', 'i')
         if choice == 'q' or choice == 'h':
             globalOperators(choice)
@@ -152,8 +156,86 @@ def getCase():
                         print ' [INFO]: Case (nr ' + case + ') deleted!'
             else:
                 print '\n No cases found in the database.\n'
+        elif choice == 4:
+            manageUsers()
         else:
             print '\n Wrong input, try again!\n'
+
+
+def manageUsers():
+    printWelcomeScreen()
+    while True:
+        print ' 1. New user\n 2. Delete user\n\n b. Back to menu\n'
+        choice = functions.askInput('Make a choice', 'i')
+        if choice == 'q' or choice == 'h':
+            globalOperators(choice)
+        elif choice == 'b':
+            printWelcomeScreen()
+            break
+        elif choice == 1 or choice == 2:
+            if choice == 1:
+                if manageUser('new'):
+                    printWelcomeScreen()
+                    print ' User succesfully added to the database.\n\n'
+            if choice == 2:
+                if manageUser('delete'):
+                    printWelcomeScreen()
+                    print ' User succesfully deleted.\n'
+        else:
+            print '\n Wrong input, try again!\n'
+
+
+def manageUser(action):
+    result = False
+    printWelcomeScreen()
+    if action == 'new':
+        while True:
+            print ' Create new user, follow instructions:\n'
+            while True:
+                username = functions.askInput('Enter username', 's')
+                if not functions.checkUserExist(username):
+                    break
+                else:
+                    print '\n [ERROR]: Username exist, try another name.\n'
+            password = functions.askInput('Enter password', 's')
+            if functions.createUser(username, password):
+                result = True
+                break
+            else:
+                print '\n [ERROR]: User cannot be created!\n'
+                break
+    elif action == 'delete':
+        users = functions.getUsers()
+        if len(users) > 1:
+            userIDs = functions.getUserIDs()
+            print ' Delete user, follow instructions:\n'
+            while True:
+                for user in users:
+                    if not str(user[0]) == str(userID):
+                        print(' {0}: {1}'.format(user[0], user[1]))
+                print '\n b. Back to menu.'
+                choice = functions.askInput('\n Make a choice', 'i')
+                if choice == 'q' or choice == 'h':
+                    globalOperators(choice)
+                elif choice == 'b':
+                    getCase()
+                elif choice in userIDs:
+                    if not str(choice) == str(userID):
+                        username = functions.getUsername(str(choice))
+                        question = '[WARNING]: Deleting `' + username + '`? '
+                        question += 'Y = yes, P = permanently, other keys = abort'
+                        confirm = functions.askInput(question, 's')
+                        if confirm.lower() == 'y' or confirm.lower() == 'p':
+                            functions.deleteUser(str(choice), confirm.lower())
+                            result = True
+                        break
+                    else:
+                        print '\n You cannot delete yourself!\n'
+                else:
+                    print '\n Wrong input, try again!\n'
+        else:
+            print '\n [ERROR]: No other users found.\n'
+    return result
 
 
 def manageCase(cases, action):
@@ -166,9 +248,12 @@ def manageCase(cases, action):
     while True:
         for case in cases:
             print(' {0}: {1}'.format(case[0], case[1]))
-        choice = functions.askInput('\n Select case', 'i')
+        print '\n b. Back to menu.'
+        choice = functions.askInput('\n Make a choice', 'i')
         if choice == 'q' or choice == 'h':
             globalOperators(choice)
+        elif choice == 'b':
+            getCase()
         elif choice in casesNumbers:
             details = getCaseDetails(choice)
             if action == 'select':

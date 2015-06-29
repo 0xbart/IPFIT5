@@ -36,7 +36,7 @@ def askInput(message, type):
                 var = raw_input(" " + message + ": ")
 
                 # Send q or h back for help or quit function!
-                if var == 'q' or var == 'h':
+                if var == 'q' or var == 'h' or var == 'b':
                     break
 
                 var = int(var)
@@ -83,6 +83,20 @@ def checkLogin(username, password):
     return result
 
 
+def createUser(username, password):
+    result = False
+    try:
+        db = sqlite3.connect('db' + getOsSlash() + 'pythronic.db')
+        cursor = db.cursor()
+        cursor.execute('''INSERT INTO users (name, pass, deleted)
+            VALUES (?,?,?)''', (username, getHash(password), '0'))
+        db.commit()
+        result = True
+    except:
+        pass
+    return result
+
+
 def getCases():
     cases = None
 
@@ -96,6 +110,21 @@ def getCases():
         print ' [Error]: while getting cases of database.'
 
     return cases
+
+
+def getUsers():
+    users = None
+
+    try:
+        db = sqlite3.connect('db' + getOsSlash() + 'pythronic.db')
+        cursor = db.cursor()
+        rows = cursor.execute("SELECT id, name FROM users \
+                               WHERE deleted = '0'")
+        users = rows.fetchall()
+    except:
+        print ' [Error]: while getting users of database.'
+
+    return users
 
 
 def getCaseID(name):
@@ -126,6 +155,53 @@ def getCaseName(ID):
         print ' [Error]: Error while getting the case name.'
 
     return name
+
+
+def getUserID(name):
+    userID = None
+
+    try:
+        db = sqlite3.connect('db' + getOsSlash() + 'pythronic.db')
+        cursor = db.cursor()
+        user = cursor.execute("SELECT id FROM users \
+                               WHERE name = '" + name + "'")
+        userID = user.fetchone()[0]
+    except:
+        print ' [Error]: Error while getting the user ID.'
+
+    return userID
+
+
+def getUsername(ID):
+    username = None
+
+    try:
+        db = sqlite3.connect('db' + getOsSlash() + 'pythronic.db')
+        cursor = db.cursor()
+        user = cursor.execute("SELECT name FROM users \
+                               WHERE id = '" + ID + "'")
+        username = user.fetchone()[0]
+    except:
+        print ' [Error]: Error while getting the username.'
+
+    return str(username)
+
+
+def checkUserExist(name):
+    existing = False
+
+    try:
+        db = sqlite3.connect('db' + getOsSlash() + 'pythronic.db')
+        cursor = db.cursor()
+        countRows = cursor.execute("SELECT EXISTS(SELECT 1 FROM users \
+                                    WHERE name = '" + name + "');")
+
+        if countRows.fetchone()[0] == 1:
+            existing = True
+    except:
+        return False
+
+    return existing
 
 
 def checkCaseExist(name):
@@ -160,6 +236,23 @@ def getCasesNumbers():
         print ' [ERROR]: Error while getting the case numbers'
 
     return casesNumbers
+
+
+def getUserIDs():
+    userIDs = []
+
+    try:
+        db = sqlite3.connect('db' + getOsSlash() + 'pythronic.db')
+        cursor = db.cursor()
+        ids = cursor.execute("SELECT id FROM users \
+                                WHERE deleted = '0'")
+        ids = ids.fetchall()
+        for i in ids:
+            userIDs.append(i[0])
+    except:
+        print ' [ERROR]: Error while getting the user ID\'s'
+
+    return userIDs
 
 
 def createCase(name, desc, user):
@@ -203,6 +296,28 @@ def deleteCase(ID, operation):
         result = True
     except:
         print '\n [ERROR]: Case cannot be deleted!\n'
+
+    return result
+
+
+def deleteUser(ID, operation):
+    result = False
+
+    try:
+        db = sqlite3.connect('db' + getOsSlash() + 'pythronic.db')
+        cursor = db.cursor()
+
+        if operation == 'y':
+            cursor.execute("UPDATE users SET deleted = '1' \
+                            WHERE id = '" + ID + "'")
+
+        if operation == 'p':
+            cursor.execute("DELETE FROM users WHERE id = '" + ID + "'")
+
+        db.commit()
+        result = True
+    except:
+        print '\n [ERROR]: user cannot be deleted!\n'
 
     return result
 
