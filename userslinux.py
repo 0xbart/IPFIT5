@@ -1,6 +1,6 @@
 import os
 
-__author__ = 'Michaël'
+__author__ = 'Michael'
 
 try:
     os.system("awk -F':' '{ print $1}' /etc/passwd)")

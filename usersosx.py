@@ -1,6 +1,6 @@
 import os
 
-__author__ = 'Michaël'
+__author__ = 'Michael'
 
 try:
     os.system("dscl . list /Users | grep -v '^_'")

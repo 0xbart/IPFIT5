@@ -1,6 +1,6 @@
 import os
 
-__author__ = 'Michaël'
+__author__ = 'Michael'
 
 # List hardware on Linux using a command
 
