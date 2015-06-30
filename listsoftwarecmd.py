@@ -1,5 +1,7 @@
+import os
+
 __author__ = 'Michael'
 
-import os
+# List software through CMD
 
 os.system('wmic product get name')
