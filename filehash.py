@@ -1,7 +1,6 @@
 import os
 import os.path as osp
 import hashlib
-#import interface
 
 def hash():
     def filehash(filepath):
