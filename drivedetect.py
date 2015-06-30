@@ -6,9 +6,7 @@ print ("The following drives have been detected:")
 
 
 def driveinfolinux():
-
     # Cross platform schijf info
-
     diskinfo = str(psutil.disk_partitions())
     diskinfolist = diskinfo.split('),')
     x = 0

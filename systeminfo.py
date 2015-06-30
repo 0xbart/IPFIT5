@@ -20,6 +20,7 @@ def userinfo():
             cputype = i.Name
 
     # List of hardware detection functions
+    # math.pow function to convert mem. output to human readable numbers
         hardwarelist = ["PC name:                            " +
                         socket.gethostname(),
                         "Username:                           " +
