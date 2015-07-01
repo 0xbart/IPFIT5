@@ -139,11 +139,11 @@ def newCase():
         desc = functions.askInput('Enter description case', 's')
         if name.isalpha():
             if functions.createCase(name, desc, user):
-                print (' [Info]: Case succesfully created.')
+                print (' [INFO]: Case succesfully created.')
                 result = functions.getCaseID(name)
                 break
         else:
-            print '\n []: Name can only be alphabetic.\n'
+            print '\n [ERROR]: Name can only be alphabetic.\n'
     return result
 
 
@@ -155,7 +155,7 @@ def getCase():
         choice = functions.askInput('Make a choice', 'i')
         if choice == 'q' or choice == 'h':
             globalOperators(choice)
-        if choice == 'b':
+        elif choice == 'b':
             clearUserDetails()
             clearScreen()
             print ' \n Succesfully logged out.\n\n'
@@ -168,7 +168,7 @@ def getCase():
                 if details:
                     break
             else:
-                print '\n  while creating new case'
+                print '\n  [ERROR]: while creating new case.'
         elif choice == 2 or choice == 3:
             cases = functions.getCases()
             if len(cases) > 0:
@@ -347,6 +347,12 @@ def menu():
             clearCaseDetails()
             getCase()
             menu()
+        elif choice == 1:
+            new = newEvidence()
+            if new:
+                print '\n [INFO]: Evidence ' + new + ' created succesfully!'
+            else:
+                print '\n [ERROR]: while creating new evidence.'
         else:
             print 'jeah'
 
