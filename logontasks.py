@@ -1,6 +1,6 @@
 from _winreg import *
 
-__author__ = 'Michaël'
+__author__ = 'Michael'
 
 # Read the registry at printed location for logon tasks
 
