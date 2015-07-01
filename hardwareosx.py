@@ -1,5 +1,8 @@
 import os
 
-# List hardware on OSx
+# List hardware on OSx using shell command
 
-os.system("system_profiler | grep 'Serial Number (system)' | grep 'Hardware UUID" | grep 'kind')
+try:
+	scan.write(os.system("system_profiler | grep -A 14 'Hardware overview'")
+except:
+	print "could not perform hardware scan on this system"
