@@ -6,10 +6,10 @@ softwarelist = []
 
 # Search first registry
 
-def read_first_registry():
+
+def readfirst():
     uninstall = ConnectRegistry(None, HKEY_LOCAL_MACHINE)
-    regcontent = OpenKey(uninstall,
-                        r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall")
+    regcontent = OpenKey(uninstall, r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall")
     for i in range(1024):
         try:
             keyname = EnumKey(regcontent, i)
@@ -22,10 +22,9 @@ def read_first_registry():
 # Search second registry
 
 
-def read_second_registry():
+def readsecond():
     uninstall = ConnectRegistry(None, HKEY_LOCAL_MACHINE)
-    regcontent = OpenKey(uninstall,
-    r"SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall")
+    regcontent = OpenKey(uninstall, r"SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall")
     for i in range(1024):
         try:
             keyname = EnumKey(regcontent, i)
@@ -35,8 +34,9 @@ def read_second_registry():
         except WindowsError:
             pass
     print "These programs are recorded in the registry (for this user only) :"
-    list(set(softwarelist))
-    print softwarelist
+    uniquelist = list(set(softwarelist))
+    uniquelist.sort()
+    print uniquelist
 
-read_first_registry()
-read_second_registry()
+readfirst()
+readsecond()
