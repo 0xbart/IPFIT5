@@ -1,7 +1,6 @@
 import os
 import os.path as osp
 import hashlib
-#import interface
 
 def hash():
     def filehash(filepath):
@@ -15,7 +14,7 @@ def hash():
                 sha.update(data)
         return sha.hexdigest()
 
-    ROOT = input("""Which folder would you like to hash? Choose "." for current. \n""")
+    ROOT = raw_input("""Which folder would you like to hash? Choose "." for current. \n""")
 
     def write(text):
         print(text)
@@ -27,14 +26,9 @@ def hash():
             sha = filehash(fpath)
             name = osp.relpath(fpath, ROOT)
 
-            write('%s,%s,%s' % (size, sha, name))
+            write('%s, %s, %s' % (size, sha, name))
             with open("hashes.txt", "a") as hashes:
-                hashes.write('%s,%s,%s' % (size, sha, name) + '\n')
-
-            #for ignored in ['.hg', '.svn', 'git']:
-            #     if ignored in dirs:
-            #         dirs.remove(ignored)
-    #interface.menu()
+                hashes.write('%s, %s, %s' % (size, sha, name) + '\n')
 
 if __name__ == '__main__':
     hash()
