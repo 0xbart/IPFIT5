@@ -2,7 +2,7 @@ from dirtools import Dir
 import os.path
 import os
 
-path = '/Users/Bart/Downloads'
+path = '/Users/Bart/Downloads/folder-tree-static/_TEST/zzz'
 
 
 def getHTMLItems(d, l):
@@ -13,6 +13,7 @@ def getHTMLItems(d, l):
         d = Dir(tmppath, exclude_file='.gitignore')
 
         files = d.files()
+
         for file in files:
         	html += '<li class="dhtmlgoodies_sheet.gif"><a href="#">' + file + '</a></li>'
     else:
@@ -31,6 +32,8 @@ def createHTML(d, first):
         if os.path.isdir(os.path.join(d,l)):
             res += '<li><a href="#">' + l + '</a>'
             res += createHTML(os.path.join(d,l), False)
+            if not first:
+                res += getHTMLItems(d, l)
             res += '</li>'
     res += '</ul>'
     html = res.replace('<ul></ul>', '')
