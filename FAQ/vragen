@@ -1,0 +1,201 @@
+#Algemeen
+##Door wie is Pythronic ontwikkeld?
+
+
+##Met welk doel is Pythronic ontwikkeld? 
+
+
+##Is het verkregen bewijs juridisch toepasbaar?
+Pythronic is een triage tool. Dit houd in dat de tool informatie kan verkrijgen uit een informatiesysteem, en geld daarom als een hulpmiddel. Controleer altijd voorafgaand bij gebruik van de applicatie of de juiste bevoegdheden aanwezig zijn om dit hulpmiddel te mogen gebruiken.
+
+Om de authenticiteit van de bestanden te bewaren en achteraf te controleren, is het met Pytronic mogelijk om de unieke waardes (hash waardes) van bestanden te bepalen en weg te schrijven.
+Bij het vergaren van informatie zal Pytronic enkel gebruik maken van 'read-only' rights. Dit houd in dat het programma niet de bestanden bewerkt en hierdoor de authenticiteit waarborgt.
+#Applicatie
+##Algemeen
+###Op welke versie van Python draait Pythronic?
+Pythronic is ontwikkelt in Python 2.7. Hiervoor is gekozen dat er meer libaries voor beschikbaar zijn en dat het minder foutgevoelig is in tegenstelling tot Python 3.0. <br>
+
+###Onder welke besturingssystemen werkt Pythronic?
+Pythronic is ontwikkeld voor de volgende besturingssystemen: 
+<ul>
+	<li>Microsoft Windows 7</li>
+	<li>Apple OSX 10.10</li>
+	<li>Linux Debian</li>
+</ul><br>
+
+##Installatie
+###Welke libaries zijn nodig om de applicatie te kunnen laten draaien?
+Pythronic maakt gebruik van de volgende libaries:
+<ul>
+	<li> Pyperclip
+	<li> psutil
+	<li> exifread
+	<li> exifconvert
+	<li> os
+	<li> os.path
+	<li> Nominatim
+	<li> osp
+	<li> hashlib
+	<li> sqlite3
+	<li> time
+	<li> signal
+	<li> sys
+	<li> setup
+	<li> shutil
+	<li> datetime
+	<li> time
+	<li> filehash
+	<li> _winreg
+	<li> winreg
+	<li> pyautogui
+	<li> subprocess
+	<li> functions
+	<li> webbrowser
+	<li> win32api
+	<li> wmi
+	<li> math
+	<li> socket
+	<li> platform
+	<li> virtual_memory
+	<li> VirusTotalPublicApi
+	<li> re
+	<li> json
+	<li> PublicApi
+</ul>
+
+##Gebruiker
+###Hoe maak ik een nieuwe gebruikersnaam aan?
+
+###Hoe verander ik mijn wachtwoord?
+
+###Hoe verander ik de username?
+In deze versie van de applicatie is dit helaas nog niet mogelijk. 
+
+###Hoe verwijder ik een gebruiker?
+
+
+###Als ik een gebruiker verwijder, zijn zijn cases dan nog toegankelijk?
+
+##Case
+###Wat is een case?
+Een case is een digitale ruimte waar informatie over je zaak wordt opgeslagen. Denk hierbij aan informatie welke is verkregen uit een informatiesysteem. 
+
+###Hoe kan een nieuwe case worden aangemaakt?
+
+
+###Waar staan de gegevens opgeslagen?
+
+
+###Help! Ik heb een case verwijderd terwijl dat niet de bedoeling was. Ben ik dit nu kwijt?
+Maak je geen zorgen. Wij hebben er voor gezorgd dat de case enkel uit het keuze overzicht is verdwenen, maar je gegevens staan nog wel bewaard in de database.<br>
+Door de database door middel van een SQLite browser te openen, zijn de gegevens te vinden. Door bij de case een 0 in een 1 te veranderen, verschijnen de gegevens weer in de applicatie.
+
+###Hoe kan ik een case definitief verwijderen?
+
+
+###Voor wie is mijn case toegankelijk?
+In deze versie van Pythronic is het voor alle gebruikers mogelijk om elkaars cases in te zien.
+
+###Kan ik meerdere gebruikers toegang geven tot mijn case?
+Ja. Alle gebruikers hebben toegang tot elkaars cases. 
+
+###Hoe
+
+
+##Functionaliteiten
+###Clipboard
+De clipboard functionaliteit schrijft de aanwezige informatie in de clipboard weg naar bestand clipboard.txt. 
+<br><br>
+Clipboard werkt op: Windows, OSX, Linux
+###Drive detect
+
+Werkt op: Windows, OSX, Linux
+###Exif data
+
+Werkt op: Windows, OSX, Linux
+###File hashing
+File Hashing stelt de gebruiker in staat op unieke waardes, zogenaamde hashes, te onttrekken vanuit de code en vervolgens op te slaan. Deze codes kunnen worden gebruikt om de integriteit van een bestand te controleren. 
+<br><br>
+Werkt op: Windows, OSX, Linux
+###Internet history
+De module ‘Internet history’ geeft de onderzoeker inzicht in, indien aanwezig, de volgende webbrowsers:
+<br><br>
+<ul>
+<li>Internet Explorer</li>
+<li>Firefox</li>
+<li>Google Chrome</li>
+<li>Safari</li>
+</ul><br>
+
+Werkt op: 
+###Software list
+Om inzicht te krijgen in welke software is geïnstalleerd op de computer, kan de module ‘Software list’ worden gelanceerd.
+<br><br>
+Werkt op: Windows
+###Start-up 
+Wanneer een computer wordt opgestart, worden er ook een aantal applicaties opgestart. Welke applicaties dit zijn, kan worden achterhaalt met de ‘Start-up’ module.
+<br><br>
+Werkt op: Windows
+###Network connections
+Om de onderzoeker inzicht te geven in de netwerkverbindingen van het systeem, kan ‘Network connections’ worden aangeroepen. Deze module toont de IP adressen welke actief zijn op het systeem.
+<br><br>
+Werkt op: Windows, OSX, Linux
+
+###Timezone
+Om de tijd van bewijsstukken te kunnen interpreteren, is het van belang dat de systeemtijd bekend is. De module timezone brengt de exacte tijd en datum van de computer in kaart. 
+<br><br>
+Werkt op: Windows, OSX, Linux
+
+###System information
+System information is geschreven om de onderzoeker inzicht te geven in de hardware van het te onderzoeken systeem. Er wordt informatie van de volgende onderdelen opgevraagd; <br>
+<ul>
+<li> PC name
+<li> Username
+<li> System architecture
+<li> Operating system
+<li> Processor name
+<li> Processor family
+<li> Total virtual memory in Gb
+<li> Used virtual memory in Gb
+<li> Available virtual memory in Gb
+</ul>
+<br><br>
+Werkt op: Windows
+###Usernames
+Een computer kan meerdere gebruikers bevatten. De module Usernames brengt deze voor de onderzoeker in kaart. 
+<br><br>
+Werkt op: Windows, OSX, Linux
+
+###Virustotal
+Virus controle stelt de onderzoeker in staat om te controleren of een bestand is besmet met een virus of andere kwaadaardige software. De onderzoeker kan een bestand selecteren, waarna de data automatisch naar Virustotal.com wordt geüpload en wordt geanalyseerd.<br><br>
+<strong>Let op: Er dient een internet verbinding aanwezig te zijn</strong><br>
+Werkt op: Windows, OSX, Linux
+
+###Cloud services
+Om onderzoek te doen naar welke clouddiensten er op een computer draaien, is de Cloud controle toegevoegd. Deze module stelt te gebruiker in staat om te controleren of de volgende clouddiensten actief zijn op de computer:<br>
+<ul>
+<li>OneDrive
+<li>Evernote
+<li>Dropbox
+<li>Google Drive
+</ul>
+Cloud controle werkt op: Windows, OSX, Linux
+###Mousejiggler
+Tijdens een onderzoek dient te worden voorkomen dat een computer in slaapstand raakt, omdat dit een beveiliging zou kunnen activeren. Om dit te voorkomen, is de mousejiggler toegevoegd.
+<br><br>
+De mousejiggler zorgt ervoor dat de muis continue beweegt zodat de computer denkt dat er een gebruiker achter de computer zit. Aan de hand van een vooraf ingestelde aantal pixels beweegt de muis. 
+<br><br>
+Werkt op: Windows, OSX, Linux
+
+
+
+
+
+
+
+
+
+
+
+
+
