@@ -2,7 +2,7 @@ from dirtools import Dir
 import os.path
 import os
 
-path = '/Users/Bart/Downloads/folder-tree-static/_TEST/zzz'
+path = '/Users/Bart/Downloads'
 
 
 def getHTMLItems(d, l):

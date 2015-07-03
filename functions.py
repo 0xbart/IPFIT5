@@ -331,9 +331,9 @@ def createEvidence(name, desc, casename, evidenceType):
                         getOsSlash() + casename + '.db')
             db = sqlite3.connect(database)
             cursor = db.cursor()
-            cursor.execute('''INSERT INTO evidences (name, description, created_at, deleted)
-                              VALUES (?,?,?,?,?)''', (
-                              name, desc,
+            cursor.execute('''INSERT INTO evidences (name, description, type,
+                              created_at, deleted) VALUES (?,?,?,?,?)''', (
+                              name, desc, evidenceType,
                               time.strftime("%Y-%m-%d"), '0'))
             db.commit()
             if setup.createEvidenceTables(name, casename, evidenceType):
@@ -363,6 +363,102 @@ def checkEvidenceExist(name, casename):
         return False
 
     return existing
+
+
+def getEvidences(casename):
+    evidences = None
+
+    try:
+        database = ('db' + getOsSlash() + 'cases' +
+                    getOsSlash() + casename + '.db')
+        db = sqlite3.connect(database)
+        cursor = db.cursor()
+        rows = cursor.execute("SELECT id, name FROM evidences \
+                               WHERE deleted = '0'")
+        rows = rows.fetchall()
+        evidences = rows
+    except:
+        print ' [Error]: while getting evidences of database.'
+
+    return evidences
+
+
+def getEvidenceIDs(casename):
+    evidenceIDs = []
+
+    try:
+        database = ('db' + getOsSlash() + 'cases' +
+                    getOsSlash() + casename + '.db')
+        db = sqlite3.connect(database)
+        cursor = db.cursor()
+        ids = cursor.execute("SELECT id FROM evidences \
+                                WHERE deleted = '0'")
+        ids = ids.fetchall()
+        for i in ids:
+            evidenceIDs.append(i[0])
+    except:
+        print ' [ERROR]: Error while getting the evidence ID\'s'
+
+    return evidenceIDs
+
+
+def getEvidence(casename, ID):
+    evidenceName = None
+
+    try:
+        database = ('db' + getOsSlash() + 'cases' +
+                    getOsSlash() + casename + '.db')
+        db = sqlite3.connect(database)
+        cursor = db.cursor()
+        evicence = cursor.execute("SELECT name FROM evidences \
+                               WHERE id = '" + ID + "'")
+        evidenceName = evicence.fetchone()[0]
+    except:
+        print ' [Error]: Error while getting the evidence name.'
+
+    return str(evidenceName)
+
+
+def getEvidenceType(casename, ID):
+    eType = None
+
+    try:
+        database = ('db' + getOsSlash() + 'cases' +
+                    getOsSlash() + casename + '.db')
+        db = sqlite3.connect(database)
+        cursor = db.cursor()
+        evidence = cursor.execute("SELECT type FROM evidences \
+                               WHERE id = '" + ID + "'")
+        eType = evidence.fetchone()[0]
+    except:
+        print ' [Error]: Error while getting the evidence ID.'
+
+    return str(eType)
+
+
+def deleteEvidence(casename, ID, operation):
+    result = False
+
+    try:
+        database = ('db' + getOsSlash() + 'cases' +
+                    getOsSlash() + casename + '.db')
+        db = sqlite3.connect(database)
+        cursor = db.cursor()
+
+        if operation == 'y':
+            cursor.execute("UPDATE evidences SET deleted = '1' \
+                            WHERE id = '" + ID + "'")
+
+        if operation == 'p':
+            cursor.execute("DELETE FROM evidences WHERE id = '" + ID + "'")
+            setup.deleteEvidence(casename, getEvidence(casename, ID), getEvidenceType(casename, ID))
+
+        db.commit()
+        result = True
+    except:
+        print '\n [ERROR]: evidence cannot be deleted!\n'
+
+    return result
 
 
 def appendLog(level, message):

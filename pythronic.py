@@ -350,27 +350,78 @@ def menu():
         elif choice == 1:
             new = newEvidence()
             if new:
-                print '\n [INFO]: Evidence ' + new + ' created succesfully!'
+                printWelcomeScreen()
+                print ' [INFO]: Evidence ' + new + ' created succesfully!\n'
             else:
-                print '\n [ERROR]: while creating new evidence.'
+                printWelcomeScreen()
+                print ' [ERROR]: while creating new evidence.\n'
+        elif choice == 2:
+            evidences = functions.getEvidences(casename)
+            if len(evidences) > 0:
+                evidenceIDs = functions.getEvidenceIDs(casename)
+                printWelcomeScreen()
+                print ' Delete evidence, follow instructions:\n'
+                while True:
+                    for evidence in evidences:
+                        print(' {0}: {1}'.format(evidence[0], evidence[1]))
+                    print '\n b. Back to menu.'
+                    choice = functions.askInput('\n Make a choice', 'i')
+                    if choice == 'q' or choice == 'h':
+                        globalOperators(choice)
+                    elif choice == 'b':
+                        printWelcomeScreen()
+                        break
+                    elif choice in evidenceIDs:
+                        evidence = functions.getEvidence(casename, str(choice))
+                        question = '[WARNING]: Deleting `' + evidence + '`? '
+                        question += 'Y = yes, P = permanently, other = abort'
+                        confirm = functions.askInput(question, 's')
+                        if confirm.lower() == 'y' or confirm.lower() == 'p':
+                            if functions.deleteEvidence(casename, str(choice), confirm.lower()):
+                                printWelcomeScreen()
+                                print ' [INFO]: Evidence ' + evidence + ' deleted succesfully!\n'
+                            else:
+                                printWelcomeScreen()
+                                print ' [ERROR]: Evidence ' + evidence + ' cannot be deleted!\n'
+                        else:
+                            printWelcomeScreen()
+                            break
+                    else:
+                        printWelcomeScreen()
+                        print ' Wrong input, try again!\n'
+            else:
+                printWelcomeScreen()
+                print ' [ERROR]: No evidences found.\n'
+        elif choice == 3:
+            print 'scan starten...'
+        elif choice == 4:
+            print 'rapport bouwen'
         else:
-            print 'jeah'
+            print '\n Wrong input, try again!\n'
 
 
 def newEvidence():
     result = False
+    evidenceTypes = ['1', '2']
+    sEtype = ('\n Type evidence: \n\n 1: Computer / Laptop / Server\n '
+              '2: Device (USB, SD, HDD)\n\n Enter type evidence ID')
     printWelcomeScreen()
     while True:
         print ' Creating new evidence\n'
         name = functions.askInput('Enter name evidence', 's')
         desc = functions.askInput('Enter description evidence', 's')
-        if name.isalpha():
-            if functions.createEvidence(name, desc, casename):
-                print (' [INFO]: Case succesfully created.')
+        etype = functions.askInput(sEtype, 's')
+        if name.isalpha() and etype in evidenceTypes:
+            if functions.createEvidence(name, desc, casename, etype):
                 result = name
                 break
         else:
-            print '\n [ERROR]: Name must be an alphabetic string, no spaces.\n'
+            if not etype in evidenceTypes:
+                printWelcomeScreen()
+                print ' [ERROR]: EvidenceType is not a valid choice.\n'
+            else:
+                printWelcomeScreen()
+                print ' [ERROR]: Name must be an alphabetic string, no spaces.\n'
     return result
 
 
