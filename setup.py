@@ -59,6 +59,7 @@ def createDBUser(db):
     except:
         print ' [Error]: User cannot be created!'
 
+
 # END DEFAULT DATABASE
 # START CASE DATABASE
 
@@ -88,7 +89,7 @@ def createCaseDBTables(db):
         sql = ('''CREATE TABLE general (id INTEGER PRIMARY KEY,
                   name TEXT, description TEXT, created_at TIMESTAMP);
                   CREATE TABLE evidences (id INTEGER PRIMARY KEY, name TEXT,
-                  description TEXT, deleted INTEGER);''')
+                  description TEXT, type INTEGER, deleted INTEGER);''')
         db.executescript(sql)
         result = True
     except:
@@ -125,7 +126,78 @@ def removeCaseDatabase(ID):
 
     return result
 
+
 # END CASE DATABASE
+# START EVIDENCE DATABASE
+
+
+def createEvidenceTables(name, casename, evidenceType):
+    result = False
+
+    try:
+        db = sqlite3.connect('db' + functions.getOsSlash() + 'cases' +
+                             functions.getOsSlash() + casename + '.db')
+        cursor = db.cursor()
+
+        if evidenceType == '1':
+            sql_1 = ('CREATE TABLE `' + name + '_hardware` ('
+                     'id INTEGER PRIMARY KEY, processor TEXT, '
+                     'usb_devices TEXT, system_arch TEXT, proc_name TEXT, '
+                     'proc_family TEXT, used_memory TEXT, free_memory TEXT, '
+                     'total_memory TEXT)')
+            sql_2 = ('CREATE TABLE `' + name + '_software` ('
+                     'id INTEGER PRIMARY KEY, name TEXT)')
+            sql_3 = ('CREATE TABLE `' + name + '_users` ('
+                     'id INTEGER PRIMARY KEY, name TEXT)')
+            sql_4 = ('CREATE TABLE `' + name + '_general` ('
+                     'id INTEGER PRIMARY KEY, os TEXT, ddate TEXT, '
+                     'ttime TEXT, timezone TEXT, clip_out TEXT, '
+                     'pc_name TEXT, username TEXT)')
+            sql_5 = ('CREATE TABLE `' + name + '_network` ('
+                     'id INTEGER PRIMARY KEY, ip TEXT, mac TEXT, '
+                     'connected_ip TEXT)')
+            sql_6 = ('CREATE TABLE `' + name + '_cloud` ('
+                     'id INTEGER PRIMARY KEY, dropbox INTEGER, '
+                     'onenote INTEGER, evernote INTEGER, googledrive INTEGER)')
+            sql_7 = ('CREATE TABLE `' + name + '_virus` ('
+                     'id INTEGER PRIMARY KEY, virus_name TEXT, '
+                     'virus_hash TEXT, virus_output TEXT)')
+            sql_8 = ('CREATE TABLE `' + name + '_drive` ('
+                     'id INTEGER PRIMARY KEY, drive_name TEXT, '
+                     'drive_detail TEXT)')
+            sql_9 = ('CREATE TABLE `' + name + '_files` ('
+                     'id INTEGER PRIMARY KEY, name TEXT, parent TEXT, '
+                     'shahash TEXT, md5hash TEXT)')
+            sql_10 = ('CREATE TABLE `' + name + '_browser` ('
+                      'id INTEGER PRIMARY KEY, his_chrome TEXT, his_ff TEXT, '
+                      'his_iexplorer TEXT, his_safari TEXT)')
+            sql_11 = ('CREATE TABLE `' + name + '_unix_logon` ('
+                      'id INTEGER PRIMARY KEY, name TEXT)')
+            sql_12 = ('CREATE TABLE `' + name + '_win_logon` ('
+                      'id INTEGER PRIMARY KEY, name TEXT)')
+
+        elif evidenceType == '2':
+            sql = [
+                'CREATE TABLE `' + name + '_files` ('
+                'id INTEGER PRIMARY KEY, name TEXT, parent TEXT,'
+                ' shahash TEXT, md5hash TEXT)',
+                'CREATE TABLE `' + name + '_virus` ('
+                'id INTEGER PRIMARY KEY, virus_name TEXT, '
+                'virus_hash TEXT, virus_output TEXT)'
+            ]
+
+        for i in range(len(sql)):
+            cursor.execute(sql[i])
+
+        db.commit()
+        result = True
+    except:
+        print ' [Error]: Tables couldn\'t be created.\n'
+
+    return result
+
+
+# END EVIDENCE DATABASE
 
 
 if __name__ == '__main__':

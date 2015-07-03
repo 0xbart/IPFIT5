@@ -143,7 +143,7 @@ def newCase():
                 result = functions.getCaseID(name)
                 break
         else:
-            print '\n [ERROR]: Name can only be alphabetic.\n'
+            print '\n [ERROR]: Name must be an alphabetic string, no spaces.\n'
     return result
 
 
@@ -355,6 +355,23 @@ def menu():
                 print '\n [ERROR]: while creating new evidence.'
         else:
             print 'jeah'
+
+
+def newEvidence():
+    result = False
+    printWelcomeScreen()
+    while True:
+        print ' Creating new evidence\n'
+        name = functions.askInput('Enter name evidence', 's')
+        desc = functions.askInput('Enter description evidence', 's')
+        if name.isalpha():
+            if functions.createEvidence(name, desc, casename):
+                print (' [INFO]: Case succesfully created.')
+                result = name
+                break
+        else:
+            print '\n [ERROR]: Name must be an alphabetic string, no spaces.\n'
+    return result
 
 
 def globalOperators(choice):

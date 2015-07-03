@@ -1,7 +1,25 @@
-import os
+from dirtools import Dir
 import os.path
+import os
 
 path = '/Users/Bart/Downloads'
+
+
+def getHTMLItems(d, l):
+    html = ''
+    tmppath = d + '/' + l
+
+    if not tmppath == path:
+        d = Dir(tmppath, exclude_file='.gitignore')
+
+        files = d.files()
+        for file in files:
+        	html += '<li class="dhtmlgoodies_sheet.gif"><a href="#">' + file + '</a></li>'
+    else:
+        pass
+
+    return html
+
 
 def createHTML(d, first):
     if first:
