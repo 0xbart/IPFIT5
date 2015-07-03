@@ -1,7 +1,7 @@
 import os
 import os.path
 
-path = '/Users/Bart/Downloads'
+path = 'D:\Documents'
 
 def createHTML(d, first):
     if first:
