@@ -322,6 +322,49 @@ def deleteUser(ID, operation):
     return result
 
 
+def createEvidence(name, desc, casename, evidenceType):
+    result = False
+
+    try:
+        if not checkEvidenceExist(name, casename):
+            database = ('db' + getOsSlash() + 'cases' +
+                        getOsSlash() + casename + '.db')
+            db = sqlite3.connect(database)
+            cursor = db.cursor()
+            cursor.execute('''INSERT INTO evidences (name, description, created_at, deleted)
+                              VALUES (?,?,?,?,?)''', (
+                              name, desc,
+                              time.strftime("%Y-%m-%d"), '0'))
+            db.commit()
+            if setup.createEvidenceTables(name, casename, evidenceType):
+                result = True
+        else:
+            print '\n [ERROR]: Name evidence must be unique.\n'
+    except:
+        print '\n [ERROR]: evidence cannot be created!\n'
+
+    return result
+
+
+def checkEvidenceExist(name, casename):
+    existing = False
+
+    try:
+        database = ('db' + getOsSlash() + 'cases' +
+                    getOsSlash() + casename + '.db')
+        db = sqlite3.connect(database)
+        cursor = db.cursor()
+        countRows = cursor.execute("SELECT EXISTS(SELECT 1 FROM evidences \
+                                    WHERE name = '" + name + "');")
+
+        if countRows.fetchone()[0] == 1:
+            existing = True
+    except:
+        return False
+
+    return existing
+
+
 def appendLog(level, message):
     result = False
 
