@@ -4,7 +4,7 @@ __author__ = 'Michael'
 
 # Read the registry at printed location for logon tasks
 
-print (r"*** Reading from registry"
+print (r"*** Reading from registry "
        "SOFTWARE\Microsoft\Windows\CurrentVersion\Run ***"
        )
 
@@ -19,10 +19,12 @@ aKey = OpenKey(aReg, r"SOFTWARE\Microsoft\Windows\CurrentVersion\Run")
 for i in range(1024):
     try:
         n, v, t = EnumValue(aKey, i)
-        print (i+1, n, v)
+        print (i+1, n)
     except EnvironmentError:
         print ("You have", i,
                "tasks starting at logon, that are recorded in the registry.")
         break
+    except:
+        print "An error occured while reading the registry"
 
 CloseKey(aKey)
