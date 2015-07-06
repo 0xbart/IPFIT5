@@ -377,15 +377,16 @@ def menu():
                         question += 'Y = yes, P = permanently, other = abort'
                         confirm = functions.askInput(question, 's')
                         if confirm.lower() == 'y' or confirm.lower() == 'p':
+                            name = str(casename)
                             ID = str(choice)
-                            oper = confirm.lower()
-                            if functions.deleteEvidence(casename, ID, oper):
-                                printWelcomeScreen()
+                            oper = str(confirm.lower())
+                            if functions.deleteEvidence(name, ID, oper):
+                                # printWelcomeScreen()
                                 print (' [INFO]: Evidence ' + evidence +
                                        ' deleted succesfully!\n')
                                 break
                             else:
-                                printWelcomeScreen()
+                                # printWelcomeScreen()
                                 print (' [ERROR]: Evidence ' + evidence +
                                        ' cannot be deleted!\n')
                                 break

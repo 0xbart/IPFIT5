@@ -199,46 +199,6 @@ def createEvidenceTables(name, casename, evidenceType):
 
     return result
 
-
-def deleteEvidence(casename, name, evidenceType):
-    result = False
-
-    try:
-        db = sqlite3.connect('db' + functions.getOsSlash() + 'cases' +
-                             functions.getOsSlash() + casename + '.db')
-        cursor = db.cursor()
-
-        if evidenceType == '1':
-            sql = [
-                'DROP TABLE `' + name + '_browser`',  # 1
-                'DROP TABLE `' + name + '_cloud`',  # 2
-                'DROP TABLE `' + name + '_drive`',  # 3
-                'DROP TABLE `' + name + '_files`',  # 4
-                'DROP TABLE `' + name + '_general`',  # 5
-                'DROP TABLE `' + name + '_hardware`',  # 6
-                'DROP TABLE `' + name + '_network`',  # 7
-                'DROP TABLE `' + name + '_software`',  # 8
-                'DROP TABLE `' + name + '_unix_logon`',  # 9
-                'DROP TABLE `' + name + '_users`',  # 10
-                'DROP TABLE `' + name + '_virus`',  # 11
-                'DROP TABLE `' + name + '_win_logon`'  # 12
-            ]
-        elif evidenceType == '2':
-            sql = [
-                'DROP TABLE `' + name + '_files`',  # 1
-                'DROP TABLE `' + name + '_virus`'  # 2
-            ]
-
-        for i in range(len(sql)):
-            cursor.execute(sql[i])
-
-        db.commit()
-        result = True
-    except:
-        print ' [Error]: Tables couldn\'t be deleted.\n'
-
-    return result
-
 # END EVIDENCE DATABASE
 
 
