@@ -378,11 +378,13 @@ def menu():
                         confirm = functions.askInput(question, 's')
                         if confirm.lower() == 'y' or confirm.lower() == 'p':
                             if functions.deleteEvidence(casename, str(choice), confirm.lower()):
-                                printWelcomeScreen()
+                                # printWelcomeScreen()
                                 print ' [INFO]: Evidence ' + evidence + ' deleted succesfully!\n'
+                                break
                             else:
-                                printWelcomeScreen()
+                                # printWelcomeScreen()
                                 print ' [ERROR]: Evidence ' + evidence + ' cannot be deleted!\n'
+                                break
                         else:
                             printWelcomeScreen()
                             break

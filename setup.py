@@ -221,7 +221,7 @@ def deleteEvidence(casename, name, evidenceType):
                 'DROP TABLE `' + name + '_unix_logon`',  # 9
                 'DROP TABLE `' + name + '_users`',  # 10
                 'DROP TABLE `' + name + '_virus`',  # 11
-                'DROP TABLE `' + name + '_win_logon`',  # 12
+                'DROP TABLE `' + name + '_win_logon`'  # 12
             ]
         elif evidenceType == '2':
             sql = [
