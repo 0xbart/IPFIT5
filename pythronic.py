@@ -381,12 +381,12 @@ def menu():
                             ID = str(choice)
                             oper = str(confirm.lower())
                             if functions.deleteEvidence(name, ID, oper):
-                                # printWelcomeScreen()
+                                printWelcomeScreen()
                                 print (' [INFO]: Evidence ' + evidence +
                                        ' deleted succesfully!\n')
                                 break
                             else:
-                                # printWelcomeScreen()
+                                printWelcomeScreen()
                                 print (' [ERROR]: Evidence ' + evidence +
                                        ' cannot be deleted!\n')
                                 break

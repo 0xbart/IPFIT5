@@ -442,49 +442,25 @@ def deleteEvidence(casename, ID, operation):
     try:
         database = ('db' + getOsSlash() + 'cases' +
                     getOsSlash() + casename + '.db')
-        db = sqlite3.connect(database)
-        cursor = db.cursor()
 
         if operation == 'y':
+            db = sqlite3.connect(database)
+            cursor = db.cursor()
             cursor.execute("UPDATE evidences SET deleted = '1' \
                             WHERE id = '" + ID + "'")
+            db.commit()
 
         if operation == 'p':
-            cursor.execute("DELETE FROM evidences WHERE id = '" + ID + "'")
-
-            db_e = sqlite3.connect('db' + getOsSlash() + 'cases' +
-                                    getOsSlash() + casename + '.db')
-
-            cursor_e = db_e.cursor()
+            Etype = getEvidenceType(casename, ID)
             name = getEvidence(casename, ID)
 
-            if getEvidenceType(casename, ID) == '1':
-                sql = [
-                    'DROP TABLE `' + name + '_browser`',  # 1
-                    'DROP TABLE `' + name + '_cloud`',  # 2
-                    'DROP TABLE `' + name + '_drive`',  # 3
-                    'DROP TABLE `' + name + '_files`',  # 4
-                    'DROP TABLE `' + name + '_general`',  # 5
-                    'DROP TABLE `' + name + '_hardware`',  # 6
-                    'DROP TABLE `' + name + '_network`',  # 7
-                    'DROP TABLE `' + name + '_software`',  # 8
-                    'DROP TABLE `' + name + '_unix_logon`',  # 9
-                    'DROP TABLE `' + name + '_users`',  # 10
-                    'DROP TABLE `' + name + '_virus`',  # 11
-                    'DROP TABLE `' + name + '_win_logon`'  # 12
-                ]
-            if getEvidenceType(casename, ID) == '2':
-                sql = [
-                    'DROP TABLE `' + name + '_files`',  # 1
-                    'DROP TABLE `' + name + '_virus`'  # 2
-                ]
+            db = sqlite3.connect(database)
+            cursor = db.cursor()
+            cursor.execute("DELETE FROM evidences WHERE id = '" + ID + "'")
+            db.commit()
 
-            for i in range(len(sql)):
-                cursor_e.execute(sql[i])
+            setup.deleteEvidence(casename, name, Etype)
 
-            db_e.commit()
-
-        db.commit()
         result = True
     except:
         print '\n [ERROR]: evidence cannot be deleted!\n'
