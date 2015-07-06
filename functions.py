@@ -431,7 +431,7 @@ def getEvidenceType(casename, ID):
                                WHERE id = '" + ID + "'")
         eType = evidence.fetchone()[0]
     except:
-        print ' [Error]: Error while getting the evidence ID.'
+        print ' [Error]: Error while getting the evidence type.'
 
     return str(eType)
 
@@ -451,7 +451,8 @@ def deleteEvidence(casename, ID, operation):
 
         if operation == 'p':
             cursor.execute("DELETE FROM evidences WHERE id = '" + ID + "'")
-            setup.deleteEvidence(casename, getEvidence(casename, ID), getEvidenceType(casename, ID))
+            Etype = getEvidenceType(casename, ID)
+            setup.deleteEvidence(casename, getEvidence(casename, ID), Etype)
 
         db.commit()
         result = True

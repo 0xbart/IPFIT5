@@ -377,13 +377,17 @@ def menu():
                         question += 'Y = yes, P = permanently, other = abort'
                         confirm = functions.askInput(question, 's')
                         if confirm.lower() == 'y' or confirm.lower() == 'p':
-                            if functions.deleteEvidence(casename, str(choice), confirm.lower()):
-                                # printWelcomeScreen()
-                                print ' [INFO]: Evidence ' + evidence + ' deleted succesfully!\n'
+                            ID = str(choice)
+                            oper = confirm.lower()
+                            if functions.deleteEvidence(casename, ID, oper):
+                                printWelcomeScreen()
+                                print (' [INFO]: Evidence ' + evidence +
+                                       ' deleted succesfully!\n')
                                 break
                             else:
-                                # printWelcomeScreen()
-                                print ' [ERROR]: Evidence ' + evidence + ' cannot be deleted!\n'
+                                printWelcomeScreen()
+                                print (' [ERROR]: Evidence ' + evidence +
+                                       ' cannot be deleted!\n')
                                 break
                         else:
                             printWelcomeScreen()
@@ -418,12 +422,13 @@ def newEvidence():
                 result = name
                 break
         else:
-            if not etype in evidenceTypes:
+            if etype not in evidenceTypes:
                 printWelcomeScreen()
                 print ' [ERROR]: EvidenceType is not a valid choice.\n'
             else:
                 printWelcomeScreen()
-                print ' [ERROR]: Name must be an alphabetic string, no spaces.\n'
+                print (' [ERROR]: Name must be an alphabetic '
+                       'string, no spaces.\n')
     return result
 
 
