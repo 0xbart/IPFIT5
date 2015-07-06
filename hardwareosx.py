@@ -1,8 +1,13 @@
-import os
-
-# List hardware on OSx using shell command
+import platform
 
 try:
-	os.system("system_profiler | grep -A 14 'Hardware overview'")
+	print 'uname:', platform.uname()
+
+	print 'system   :', platform.system()
+	print 'node     :', platform.node()
+	print 'release  :', platform.release()
+	print 'version  :', platform.version()
+	print 'machine  :', platform.machine()
+	print 'processor:', platform.processor()
 except:
-	print "could not perform hardware scan on this system"
+	print "An error occurred"
