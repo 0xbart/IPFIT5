@@ -24,6 +24,7 @@ import sqlite3
 import platform
 import pyperclip
 import functions
+import subprocess
 import webbrowser
 
 
@@ -557,7 +558,7 @@ def scanComputerGeneral(casename, eName):
 
 def scanComputerHardware(casename, eName):
     result = False
-    
+
     try:
         if opeSys == 'linux' or opeSys == 'linux2':
             processor = os.system("grep 'model name' /proc/cpuinfo")
@@ -612,6 +613,38 @@ def scanComputerHardware(casename, eName):
                 (processor, system_arch, proc_family, used_memory,
                  free_memory, total_memory))
             db.commit()
+
+            result = True
+    except:
+        pass
+
+    return result
+
+
+def scanComputerStartup(casename, eName):
+    detectOs()
+
+    result = False
+
+    try:
+        if opeSys == 'linux' or opeSys == 'linux2':
+            result = True
+        elif opeSys == 'win32':
+            from _winreg import *
+
+            startUpItems = []
+            aReg = ConnectRegistry(None, HKEY_LOCAL_MACHINE)
+            aKey = OpenKey(aReg, r"SOFTWARE\Microsoft\Windows\CurrentVersion\Run")
+
+            for i in range(1024):
+                try:
+                    n, v, t = EnumValue(aKey, i)
+                    startUpItems.append(n)
+                except:
+                    pass
+
+            print n
+            time.sleep(100)
 
             result = True
     except:
