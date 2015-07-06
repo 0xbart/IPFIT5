@@ -658,7 +658,6 @@ def scanComputerStartup(casename, eName):
             cursor = db.cursor()
 
             for i in range(len(startUpItems)):
-                print i
                 cursor.execute('INSERT INTO `' + eName + '_win_logon` ('
                     'name) VALUES (?)', (str(startUpItems[i]),))
 
