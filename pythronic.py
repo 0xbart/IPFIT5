@@ -9,19 +9,23 @@
 """
 from sys import platform as _platform
 from time import gmtime, strftime
+from psutil import virtual_memory
 from datetime import datetime
 import os
 import sys
 import time
+import math
 import setup
 import signal
 import socket
 import psutil
 import getpass
 import sqlite3
+import platform
 import pyperclip
 import functions
 import webbrowser
+
 
 opeSys = None
 opeSysSlash = None
@@ -553,13 +557,65 @@ def scanComputerGeneral(casename, eName):
 
 def scanComputerHardware(casename, eName):
     result = False
+    
+    try:
+        if opeSys == 'linux' or opeSys == 'linux2':
+            processor = os.system("grep 'model name' /proc/cpuinfo")
+            system_arch = platform.architecture()
+            total_memory = os.system("cat /proc/meminfo | grep "
+                                     "MemTotal | awk '{ print $2 }'")
 
-    if opeSys == 'linux' or opeSys == 'linux2':
-        dd
-    elif opeSys == 'darwin' or opeSys == 'osx':
-        dd
-    elif opeSys == 'win32':
-        dd
+            db = sqlite3.connect(getCaseDatabase(casename))
+            cursor = db.cursor()
+            cursor.execute('INSERT INTO `' + eName + '_hardware` ('
+                'processor, system_arch, total_memory) '
+                'VALUES (?,?,?)', (
+                processor, system_arch, total_memory))
+            db.commit()
+
+            result = True
+        elif opeSys == 'darwin' or opeSys == 'osx':
+            processor = platform.processor()
+            system_arch = platform.version()
+            proc_name = platform.node()
+            proc_family = platform.machine()
+
+            db = sqlite3.connect(getCaseDatabase(casename))
+            cursor = db.cursor()
+            cursor.execute('INSERT INTO `' + eName + '_hardware` ('
+                'processor, system_arch, proc_name, proc_family) '
+                'VALUES (?,?,?,?)', (
+                processor, system_arch, proc_name, proc_family))
+            db.commit()
+
+            result = True
+        elif opeSys == 'win32':
+            import wmi
+
+            mem = virtual_memory()
+            c = wmi.WMI()
+            for i in c.Win32_Processor():
+                cputype = i.Name
+
+            processor = cputype
+            system_arch = platform.machine()
+            proc_family = platform.processor()
+            used_memory = str((mem.used/(math.pow(2, 30))))
+            free_memory = str((mem.available/(math.pow(2, 30))))
+            total_memory = str((mem.total/(math.pow(2, 30))))
+
+            db = sqlite3.connect(getCaseDatabase(casename))
+            cursor = db.cursor()
+            cursor.execute('INSERT INTO `' + eName + '_hardware` ('
+                'processor, system_arch, proc_family, used_memory, '
+                'free_memory, total_memory) VALUES (?,?,?,?,?,?)',
+                (processor, system_arch, proc_family, used_memory,
+                 free_memory, total_memory))
+            db.commit()
+
+            result = True
+    except:
+        pass
 
     return result
 
