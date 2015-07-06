@@ -529,6 +529,9 @@ def startScan(casename, eName, eType):
         if scanComputerHardware(casename, eName):
             print ' [X] Hardware settings completed.'
 
+        if scanComputerStartup(casename, eName):
+            print ' [X] Startup settings completed.'
+
         stop = functions.askInput('halt!', 's')
 
         result = True
