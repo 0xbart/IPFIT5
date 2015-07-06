@@ -515,6 +515,9 @@ def startScan(casename, eName, eType):
         if scanComputerGeneral(casename, eName):
             print ' [X] General settings completed.'
 
+        if scanComputerHardware(casename, eName):
+            print ' [X] Hardware settings completed.'
+
         result = True
     elif eType == '2':
         #  Device scan
@@ -544,6 +547,19 @@ def scanComputerGeneral(casename, eName):
         result = True
     except:
         pass
+
+    return result
+
+
+def scanComputerHardware(casename, eName):
+    result = False
+
+    if opeSys == 'linux' or opeSys == 'linux2':
+        dd
+    elif opeSys == 'darwin' or opeSys == 'osx':
+        dd
+    elif opeSys == 'win32':
+        dd
 
     return result
 
