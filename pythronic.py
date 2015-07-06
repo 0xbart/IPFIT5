@@ -8,11 +8,15 @@
     - Bart Mauritz
 """
 from sys import platform as _platform
+from time import gmtime, strftime
+from datetime import datetime
 import os
-import setup
 import sys
-import functions
+import time
+import setup
 import signal
+import pyperclip
+import functions
 import webbrowser
 
 opeSys = None
@@ -337,6 +341,8 @@ def clearUserDetails():
 def menu():
     printWelcomeScreen()
     while True:
+        evidences = functions.getEvidences(casename)
+        evidenceIDs = functions.getEvidenceIDs(casename)
         print ' 1. New evidence\n 2. Delete evidence\n 3. Start scan'
         print ' 4. Generate report\n'
         print ' h. Open FAQ\n b. Exit case\n q. Quit Pythronic\n\n'
@@ -356,9 +362,7 @@ def menu():
                 printWelcomeScreen()
                 print ' [ERROR]: while creating new evidence.\n'
         elif choice == 2:
-            evidences = functions.getEvidences(casename)
             if len(evidences) > 0:
-                evidenceIDs = functions.getEvidenceIDs(casename)
                 printWelcomeScreen()
                 print ' Delete evidence, follow instructions:\n'
                 while True:
@@ -400,7 +404,47 @@ def menu():
                 printWelcomeScreen()
                 print ' [ERROR]: No evidences found.\n'
         elif choice == 3:
-            print 'scan starten...'
+            if len(evidences) > 0:
+                printWelcomeScreen()
+                print ' Start scan, follow instructions:'
+                while True:
+                    print ' Select evidence to start scan.\n'
+                    for evidence in evidences:
+                        print(' {0}: {1}'.format(evidence[0], evidence[1]))
+                    print '\n b. Back to menu.'
+                    choice = functions.askInput('\n Make a choice', 'i')
+                    if choice == 'q' or choice == 'h':
+                        globalOperators(choice)
+                    elif choice == 'b':
+                        printWelcomeScreen()
+                        break
+                    elif choice in evidenceIDs:
+                        eID = str(choice)
+                        eName = functions.getEvidence(casename, str(choice))
+                        dtime = time.strftime("%Y-%m-%d %H:%M:%S")
+                        overview = ('\n Scan will start now on (' + dtime + ')'
+                                    ' on (case: ' + casename + ', evidence: ' +
+                                    eName + ') by user ' + user+ '.')
+                        confirm = ('Are you authorized to do this? '
+                                   'Press Y to proceed')
+                        choiceScan = functions.askInput(confirm, 's')
+                        if choiceScan.lower() == 'y':
+                            eType = functions.getEvidenceType(casename, eID)
+                            if startScan(casename, eName, eType):
+                                printWelcomeScreen()
+                                print (' [INFO]: Scan on ' + eName +
+                                       ' succesfully completed!\n')
+                            else:
+                                printWelcomeScreen()
+                                print (' [INFO]: Scan on ' + eName +
+                                       ' failed!\n')
+                        else:
+                            printWelcomeScreen()
+                            print ' [INFO]: Scan aborted.\n'
+                            break
+            else:
+                printWelcomeScreen()
+                print ' [ERROR]: No evidences found, add first an evidence.\n'
         elif choice == 4:
             print 'rapport bouwen'
         else:
@@ -444,6 +488,40 @@ def globalOperators(choice):
 
 def signal_handler(signal, frame):
     sys.exit(0)
+
+
+#  SCAN ITEMS
+
+
+def startScan(casename, eName, eType):
+    result = True
+
+    if eType == 1:
+        #  PC / Laptop scan
+        printWelcomeScreen()
+        print ' [INFO]: Scan on evidence ' + eName + ' started.\n'
+        scanComputerGeneral(casename, eName)
+    elif eType == 2:
+        #  Device scan
+        print 'b'
+
+    return result
+
+
+def scanComputerGeneral(casename, eName):
+    result = False
+
+    try:
+        timezone = strftime("%z", gmtime())
+        clipboard = pyperclip.paste()
+        result = True
+    except:
+        pass
+
+    return result
+
+
+#  END SCAN ITEMS
 
 
 if __name__ == '__main__':
