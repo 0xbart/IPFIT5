@@ -27,6 +27,12 @@ import functions
 import subprocess
 import webbrowser
 
+try:
+    from _winreg import *
+    import wmi
+except:
+    pass
+
 
 opeSys = None
 opeSysSlash = None
@@ -523,6 +529,8 @@ def startScan(casename, eName, eType):
         if scanComputerHardware(casename, eName):
             print ' [X] Hardware settings completed.'
 
+        stop = functions.askInput('halt!', 's')
+
         result = True
     elif eType == '2':
         #  Device scan
@@ -563,15 +571,15 @@ def scanComputerHardware(casename, eName):
         if opeSys == 'linux' or opeSys == 'linux2':
             processor = os.system("grep 'model name' /proc/cpuinfo")
             system_arch = platform.architecture()
-            total_memory = os.system("cat /proc/meminfo | grep "
-                                     "MemTotal | awk '{ print $2 }'")
+            total_memory = os.popen("cat /proc/meminfo | grep "
+                                    "MemTotal | awk '{ print $2 }'").read()
 
             db = sqlite3.connect(getCaseDatabase(casename))
             cursor = db.cursor()
             cursor.execute('INSERT INTO `' + eName + '_hardware` ('
                 'processor, system_arch, total_memory) '
                 'VALUES (?,?,?)', (
-                processor, system_arch, total_memory))
+                str(processor), str(system_arch), str(total_memory)))
             db.commit()
 
             result = True
@@ -590,9 +598,7 @@ def scanComputerHardware(casename, eName):
             db.commit()
 
             result = True
-        elif opeSys == 'win32':
-            import wmi
-
+        elif opeSys == 'win32' or opeSys == 'windows':
             mem = virtual_memory()
             c = wmi.WMI()
             for i in c.Win32_Processor():
@@ -622,16 +628,18 @@ def scanComputerHardware(casename, eName):
 
 
 def scanComputerStartup(casename, eName):
-    detectOs()
-
     result = False
 
     try:
         if opeSys == 'linux' or opeSys == 'linux2':
+            items = subprocess.call(['initctl show-config'], shell = True)
+            db = sqlite3.connect(getCaseDatabase(casename))
+            cursor = db.cursor()
+            cursor.execute('INSERT INTO `' + eName + '_linux_logon` ('
+                'name) VALUES (?)', (items))
+            db.commit()
             result = True
-        elif opeSys == 'win32':
-            from _winreg import *
-
+        elif opeSys == 'win32' or opeSys == 'windows':
             startUpItems = []
             aReg = ConnectRegistry(None, HKEY_LOCAL_MACHINE)
             aKey = OpenKey(aReg, r"SOFTWARE\Microsoft\Windows\CurrentVersion\Run")
@@ -643,8 +651,15 @@ def scanComputerStartup(casename, eName):
                 except:
                     pass
 
-            print n
-            time.sleep(100)
+            db = sqlite3.connect(getCaseDatabase(casename))
+            cursor = db.cursor()
+
+            for i in range(len(startUpItems)):
+                print i
+                cursor.execute('INSERT INTO `' + eName + '_win_logon` ('
+                    'name) VALUES (?)', (str(startUpItems[i]),))
+
+            db.commit()
 
             result = True
     except:

@@ -173,7 +173,7 @@ def createEvidenceTables(name, casename, evidenceType):
                 'CREATE TABLE `' + name + '_browser` ('
                 'id INTEGER PRIMARY KEY, his_chrome TEXT, his_ff TEXT, '
                 'his_iexplorer TEXT, his_safari TEXT)',  # 10
-                'CREATE TABLE `' + name + '_unix_logon` ('
+                'CREATE TABLE `' + name + '_linux_logon` ('
                 'id INTEGER PRIMARY KEY, name TEXT)',  # 11
                 'CREATE TABLE `' + name + '_win_logon` ('
                 'id INTEGER PRIMARY KEY, name TEXT)'  # 12
