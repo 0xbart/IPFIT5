@@ -572,7 +572,7 @@ def scanComputerHardware(casename, eName):
 
     try:
         if opeSys == 'linux' or opeSys == 'linux2':
-            processor = os.system("grep 'model name' /proc/cpuinfo")
+            processor = os.popen("grep 'model name' /proc/cpuinfo")
             system_arch = platform.architecture()
             total_memory = os.popen("cat /proc/meminfo | grep "
                                     "MemTotal | awk '{ print $2 }'").read()
