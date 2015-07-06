@@ -15,6 +15,10 @@ import sys
 import time
 import setup
 import signal
+import socket
+import psutil
+import getpass
+import sqlite3
 import pyperclip
 import functions
 import webbrowser
@@ -434,10 +438,12 @@ def menu():
                                 printWelcomeScreen()
                                 print (' [INFO]: Scan on ' + eName +
                                        ' succesfully completed!\n')
+                                break
                             else:
                                 printWelcomeScreen()
                                 print (' [INFO]: Scan on ' + eName +
                                        ' failed!\n')
+                                break
                         else:
                             printWelcomeScreen()
                             print ' [INFO]: Scan aborted.\n'
@@ -490,18 +496,27 @@ def signal_handler(signal, frame):
     sys.exit(0)
 
 
+def getCaseDatabase(casename):
+    detectOs()
+    return ('db' + opeSysSlash + 'cases' + opeSysSlash + casename + '.db')
+
+
 #  SCAN ITEMS
 
 
 def startScan(casename, eName, eType):
-    result = True
+    result = False
 
-    if eType == 1:
+    if eType == '1':
         #  PC / Laptop scan
         printWelcomeScreen()
         print ' [INFO]: Scan on evidence ' + eName + ' started.\n'
-        scanComputerGeneral(casename, eName)
-    elif eType == 2:
+
+        if scanComputerGeneral(casename, eName):
+            print ' [X] General settings completed.'
+
+        result = True
+    elif eType == '2':
         #  Device scan
         print 'b'
 
@@ -512,8 +527,20 @@ def scanComputerGeneral(casename, eName):
     result = False
 
     try:
+        ddate = time.strftime("%Y-%m-%d")
+        ttime = time.strftime("%H:%M:%S")
         timezone = strftime("%z", gmtime())
         clipboard = pyperclip.paste()
+        computername = socket.gethostname()
+        username = getpass.getuser()
+        db = sqlite3.connect(getCaseDatabase(casename))
+        cursor = db.cursor()
+        cursor.execute('INSERT INTO `' + eName + '_general` ('
+            'os, ddate, ttime, timezone, clip_out, pc_name, username) '
+            'VALUES (?,?,?,?,?,?,?)', (
+            opeSys, ddate, ttime, timezone, clipboard, computername, username))
+        db.commit()
+
         result = True
     except:
         pass
