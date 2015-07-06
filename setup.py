@@ -48,16 +48,20 @@ def createDBTables(db):
 
 
 def createDBUser(db):
-    try:
-        username = functions.askInput('Enter username', 's')
-        password = functions.askInput('Enter password', 's')
-
-        cursor = db.cursor()
-        cursor.execute('''INSERT INTO users (name, pass, deleted)
-            VALUES (?,?,?)''', (username, functions.getHash(password), '0'))
-        db.commit()
-    except:
-        print ' [Error]: User cannot be created!'
+    while True:
+        try:
+            username = functions.askInput('Enter username', 's')
+            password = functions.askInput('Enter password', 's')
+            if len(username) >= 4 and len(password) >= 4:
+                cursor = db.cursor()
+                cursor.execute('''INSERT INTO users (name, pass, deleted)
+                    VALUES (?,?,?)''', (username, functions.getHash(password), '0'))
+                db.commit()
+                break
+            else:
+                print(" Sorry, choose a name and password longer then 3 characters!")
+        except:
+            print ' [Error]: User cannot be created!'
 
 
 # END DEFAULT DATABASE

@@ -26,6 +26,7 @@ import pyperclip
 import functions
 import subprocess
 import webbrowser
+from subprocess import call
 
 try:
     from _winreg import *
@@ -85,24 +86,17 @@ def detectOs():
 def printWelcomeScreen():
     clearScreen()
 
-    cow1 = ' ---------------------- '
-    cow2 = '  WELCOME TO PYTHRONIC '
-    cow3 = ' ---------------------- '
-    cow4 = '             \   ^__^'
-    cow5 = '              \  (oo)\_______'
-    cow6 = '                 (__)\       )\/\\'
-    cow7 = '                     ||----w |'
-    cow8 = '                     ||     ||'
+    print('''
+    ----------------------
+    WELCOME TO PYTHRONIC
+    ----------------------
+             \   ^__^'
+              \  (oo)\_______
+                 (__)\       )\/\\
+                     ||----w |
+                     ||     ||''')
 
     print ''
-    print cow1
-    print cow2
-    print cow3
-    print cow4
-    print cow5
-    print cow6
-    print cow7
-    print cow8
 
     message = ''
 
@@ -238,17 +232,25 @@ def manageUser(action):
             print ' Create new user, follow instructions:\n'
             while True:
                 username = functions.askInput('Enter username', 's')
-                if not functions.checkUserExist(username):
-                    break
+                if len(username) >= 4:
+                    print(len(username))
+                    if not functions.checkUserExist(username):
+                        break
+                    else:
+                        print '\n [ERROR]: Username exist, try another name.\n'
                 else:
-                    print '\n [ERROR]: Username exist, try another name.\n'
-            password = functions.askInput('Enter password', 's')
-            if functions.createUser(username, password):
-                result = True
-                break
-            else:
-                print '\n [ERROR]: User cannot be created!\n'
-                break
+                    print(" Choose a username longer then 3 characters.")
+                password = functions.askInput('Enter password', 's')
+                if len(username) >= 4:
+                    if functions.createUser(username, password):
+                        result = True
+                        break
+                    else:
+                        print '\n [ERROR]: User cannot be created!\n'
+                        break
+                else:
+                    print(" Choose a password longer then 3 characters.")
+
     elif action == 'delete':
         users = functions.getUsers()
         if len(users) > 1:
@@ -572,7 +574,7 @@ def scanComputerHardware(casename, eName):
 
     try:
         if opeSys == 'linux' or opeSys == 'linux2':
-            processor = os.system("grep 'model name' /proc/cpuinfo")
+            processor = os.popen("grep 'model name' /proc/cpuinfo")
             system_arch = platform.architecture()
             total_memory = os.popen("cat /proc/meminfo | grep "
                                     "MemTotal | awk '{ print $2 }'").read()
