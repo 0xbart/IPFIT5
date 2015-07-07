@@ -973,7 +973,7 @@ def scanComputerHistoryIe(name, dest):
             shutil.copy2(internet, dest)
             result = True
         if os.path.isfile(pathThree % name):
-            internet = (pahtThree % name)
+            internet = (pathThree % name)
             shutil.copy2(internet, dest)
             result = True
     except:
