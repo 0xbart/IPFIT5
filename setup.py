@@ -224,7 +224,7 @@ def deleteEvidence(casename, name, evidenceType):
                 'DROP TABLE `' + name + '_hardware`',  # 6
                 'DROP TABLE `' + name + '_network`',  # 7
                 'DROP TABLE `' + name + '_software`',  # 8
-                'DROP TABLE `' + name + '_unix_logon`',  # 9
+                'DROP TABLE `' + name + '_linux_logon`',  # 9
                 'DROP TABLE `' + name + '_users`',  # 10
                 'DROP TABLE `' + name + '_virus`',  # 11
                 'DROP TABLE `' + name + '_win_logon`'  # 12
