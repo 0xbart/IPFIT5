@@ -822,7 +822,7 @@ def scanComputerCloud(casename, eName):
     try:
         googledrive = 0
         dropbox = 0
-        onedrive = 0
+        one_drive = 0
         evernote = 0
 
         if _platform == 'win32':
@@ -976,7 +976,7 @@ def scanComputerHistoryIe(name, dest):
             shutil.copy2(internet, dest)
             result = True
         if os.path.isfile(pathThree % name):
-            internet = (pahtThree % name)
+            internet = (pathThree % name)
             shutil.copy2(internet, dest)
             result = True
     except:
