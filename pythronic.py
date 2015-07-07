@@ -15,11 +15,13 @@ from subprocess import call
 import os
 import sys
 import time
+import glob
 import math
 import setup
 import signal
 import socket
 import psutil
+import shutil
 import getpass
 import sqlite3
 import platform
@@ -783,6 +785,8 @@ def scanComputerHistoryChromeWin(name, dest):
     try:
         chrome = ("C:\\Users\%s\AppData\Local\Google\Chrome\User Data\Default\History" % name)
         shutil.copy2(chrome, dest)
+        destSl = dest + opeSysSlash
+        os.rename(destSl + 'places.sqlite', destSl + 'chrome_history')
         result = True
     except:
         pass
@@ -796,6 +800,8 @@ def scanComputerHistoryChromeLinux(name, dest):
     try:
         chrome = ("/home/%s/.config/google-chrome/Default/History" % name)
         shutil.copy2(chrome, dest)
+        destSl = dest + opeSysSlash
+        os.rename(destSl + 'places.sqlite', destSl + 'chrome_history')
         result = True
     except:
         pass
@@ -809,6 +815,8 @@ def scanComputerHistoryChromeOsx(name, dest):
     try:
         chrome = ("/Users/%s/Library/Application Support/Google/Chrome/Default//History" % name)
         shutil.copy2(chrome, dest)
+        destSl = dest + opeSysSlash
+        os.rename(destSl + 'places.sqlite', destSl + 'chrome_history')
         result = True
     except:
         pass
@@ -823,14 +831,20 @@ def scanComputerHistoryIe(name, dest):
         if os.path.isfile("C:\\Users\%s\AppData\Local\Microsoft\Internet Explorer\IECompatData\\" % name):
             internet = ("C:\\Users\%s\AppData\Local\Microsoft\Internet Explorer\IECompatData\\" % name)
             shutil.copy2(internet, dest)
+            destSl = dest + opeSysSlash
+            os.rename(destSl + 'places.sqlite', destSl + 'IE_webcache')
             result = True
         if os.path.isfile("C:\\Users\%s\AppData\Local\Microsoft\Windows\History\\" % name):
             internet = ("C:\\Users\%s\AppData\Local\Microsoft\Windows\History\\" % name)
             shutil.copy2(internet, dest)
+            destSl = dest + opeSysSlash
+            os.rename(destSl + 'places.sqlite', destSl + 'IE_webcache')
             result = True
         if os.path.isfile("C:\\Users\%s\AppData\Local\Microsoft\Windows\WebCache\\" % name):
             internet = ("C:\\Users\%s\AppData\Local\Microsoft\Windows\WebCache\\" % name)
             shutil.copy2(internet, dest)
+            destSl = dest + opeSysSlash
+            os.rename(destSl + 'places.sqlite', destSl + 'IE_webcache')
             result = True
     except:
         pass
@@ -846,6 +860,8 @@ def scanComputerHistoryFirefoxWin(name, dest):
         osfirefoxformat = (str(osfirefox)[2:-2])
         firefox = ("C:\\Users\%s\AppData\Roaming\Mozilla\Firefox\Profiles\%s\\places.sqlite" % (name, osfirefoxformat))
         shutil.copy2(firefox, dest)
+        destSl = dest + opeSysSlash
+        os.rename(destSl + 'places.sqlite', destSl + 'firefox_places.sqlite')
         result = True
     except:
         pass
@@ -855,75 +871,93 @@ def scanComputerHistoryFirefoxWin(name, dest):
 
 def scanComputerHistoryFirefoxLinux(name, dest):
     result = False
+    current = os.getcwd()
 
     try:
         os.chdir("/home/%s/.mozilla/firefox" % name)
         for file in glob.glob("*.default"):
             firefox = ("/home/%s/.mozilla/firefox/%s/places.sqlite" % (name, file))
             shutil.copy2(firefox, dest)
+            destSl = dest + opeSysSlash
+            os.rename(destSl + 'places.sqlite', destSl + 'firefox_places.sqlite')
             result = True
     except:
         pass
+    finally:
+        os.chdir(current)
 
     return result
 
 
 def scanComputerHistoryFirefoxOsx(name, dest):
     result = False
+    current = os.getcwd()
 
     try:
         os.chdir("/Users/%s/Library/Application Support/Firefox/Profiles" % name)
         for file in glob.glob("*.default"):
             firefox = ("/Users/%s/Library/Application Support/Firefox/Profiles/%s/places.sqlite" % (name, file))
             shutil.copy2(firefox, dest)
+            destSl = dest + opeSysSlash
+            os.rename(destSl + 'places.sqlite', destSl + 'firefox_places.sqlite')
             result = True
     except:
         pass
+    finally:
+        os.chdir(current)
 
     return result
 
 
 def scanComputerHistory(casename, eName):
-    username = getpass.getuser()
+    result = False
 
-    his_iexplorer = 0
-    his_ff = 0
-    his_chrome = 0
+    try:
+        username = getpass.getuser()
 
-    datapath = 'data' + opeSysSlash + casename
-    path = os.path.realpath(datapath)
+        his_iexplorer = 0
+        his_ff = 0
+        his_chrome = 0
 
-    if not os.path.exists(datapath):
-        os.mkdir(path)
+        datapath = 'data' + opeSysSlash + casename
+        path = os.path.realpath(datapath)
 
-    if _platform == 'win32':
-        if scanComputerHistoryIe(username, path):
-            his_iexplorer = 1
-        if scanComputerHistoryChromeWin(username, path):
-            his_chrome = 1
-        if scanComputerHistoryFirefoxWin(username, path):
-            his_ff = 1
-    elif _platform == "linux" or _platform == "linux2":
-        if scanComputerHistoryChromeLinux(username, path):
-            his_chrome = 1
-        if scanComputerHistoryFirefoxLinux(username, path):
-            his_ff = 1
+        if not os.path.exists(datapath):
+            os.mkdir(path)
 
-    elif _platform == "darwin":
-        if scanComputerHistoryChromeOsx(username, path):
-            his_chrome = 1
-        if scanComputerHistoryFirefoxOsx(username, path):
-            his_ff = 1
+        if _platform == 'win32':
+            if scanComputerHistoryIe(username, path):
+                his_iexplorer = 1
+            if scanComputerHistoryChromeWin(username, path):
+                his_chrome = 1
+            if scanComputerHistoryFirefoxWin(username, path):
+                his_ff = 1
+        elif _platform == "linux" or _platform == "linux2":
+            if scanComputerHistoryChromeLinux(username, path):
+                his_chrome = 1
+            if scanComputerHistoryFirefoxLinux(username, path):
+                his_ff = 1
 
-    test = getCaseDatabase(casename)
-    print test
-    db = sqlite3.connect(test)
-    cursor = db.cursor()
-    cursor.execute('INSERT INTO `' + eName + '_browser` ('
-                	'his_chrome, his_ff, his_iexplorer) '
-                	'VALUES (?,?,?)', (
-                	his_chrome, his_ff, his_iexplorer))
-    db.commit()
+        elif _platform == "darwin":
+            if scanComputerHistoryChromeOsx(username, path):
+                his_chrome = 1
+            if scanComputerHistoryFirefoxOsx(username, path):
+                his_ff = 1
+
+        test = getCaseDatabase(casename)
+        print test
+        db = sqlite3.connect(test)
+        cursor = db.cursor()
+        cursor.execute('INSERT INTO `' + eName + '_browser` ('
+                    	'his_chrome, his_ff, his_iexplorer) '
+                    	'VALUES (?,?,?)', (
+                    	his_chrome, his_ff, his_iexplorer))
+        db.commit()
+        result = True
+    except:
+        pass
+
+    return result
 
 
 #  END SCAN ITEMS
