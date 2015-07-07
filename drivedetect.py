@@ -1,19 +1,14 @@
+__author__ = 'Michael'
+import re
 import psutil
 
-print ("The following drives have been detected:")
+def driveinfoWinUnix():
+#Cross platform schijf info
+    diskinfo = str(psutil.disk_partitions())
+    print diskinfo
+    for match in re.findall( r'[A-Z]{1}[:]{1}|[/][dev][/][a-z]{4}[0-9]{2}|[/][d][e][v][/][a-z]{3}[0-9]{0,2}|[A-Z]{2,4}|[d][e][v][/][a-z]{3}[0-9]{0,2}|[e][x][t][2-4]|[e]{0,1}[x]{0,1}[F][A][T]|[h][f][s]|[R][e][F][S]', diskinfo):
+        print match
+#Split voor aantal aanwezige schijven
 
 
-def driveinfolinux():
-        try:
-            # Cross platform schijf info
-            diskinfo = str(psutil.disk_partitions())
-            diskinfolist = diskinfo.split('),')
-            x = 0
-        # Split voor aantal aanwezige schijven
-            for num in diskinfolist:
-                x = x+1
-                print ("Drive", x, ":" + num)
-        except:
-            print "An error occurred"
-# Call function
-driveinfolinux()
+driveinfoWinUnix()
