@@ -401,7 +401,7 @@ def manageUser(action):
                 else:
                     print '\n Wrong input, try again!\n'
         else:
-            print '\n [ERROR]: No other users found.\n'
+            print ' [ERROR]: No other users found.\n'
     return result
 
 
