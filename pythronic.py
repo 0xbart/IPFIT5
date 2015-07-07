@@ -152,7 +152,7 @@ def newCase():
         desc = functions.askInput('Enter description case', 's')
         if name.isalpha():
             if functions.createCase(name, desc, user):
-                print (' [INFO]: Case succesfully created.')
+                print ' [INFO]: Case succesfully created.'
                 result = functions.getCaseID(name)
                 break
         else:
@@ -239,7 +239,7 @@ def manageUser(action):
                     else:
                         print '\n [ERROR]: Username exist, try another name.\n'
                 else:
-                    print(" Choose a username longer then 3 characters.")
+                    print ' [ERROR]: Username must be longer then 3 char.\n'
                 password = functions.askInput('Enter password', 's')
                 if len(username) >= 4:
                     if functions.createUser(username, password):
@@ -249,7 +249,7 @@ def manageUser(action):
                         print '\n [ERROR]: User cannot be created!\n'
                         break
                 else:
-                    print(" Choose a password longer then 3 characters.")
+                    print ' [ERROR]: Choose a password longer then 3 char.\n'
 
     elif action == 'delete':
         users = functions.getUsers()
@@ -660,7 +660,6 @@ def scanComputerStartup(casename, eName):
             cursor = db.cursor()
 
             for i in range(len(startUpItems)):
-                print i
                 cursor.execute('INSERT INTO `' + eName + '_win_logon` ('
                     'name) VALUES (?)', (str(startUpItems[i]),))
 

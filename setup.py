@@ -59,7 +59,8 @@ def createDBUser(db):
                 db.commit()
                 break
             else:
-                print(" Sorry, choose a name and password longer then 3 characters!")
+                print (' \n [ERROR]: Sorry, choose a name and password '
+                       'longer then 3 characters!\n')
         except:
             print ' [Error]: User cannot be created!'
 
@@ -249,4 +250,4 @@ def deleteEvidence(casename, name, evidenceType):
 
 
 if __name__ == '__main__':
-    print ("[ERROR]: setup.py can only be opened by pythronic.py.")
+    print '[ERROR]: setup.py can only be opened by pythronic.py.'

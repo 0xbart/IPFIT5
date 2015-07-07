@@ -1,4 +1,6 @@
 from dirtools import Dir
+from os import listdir
+from os.path import isfile, join
 import os.path
 import os
 
@@ -8,6 +10,9 @@ def getHTMLItems(d, l):
     html = ''
     tmppath = d + '/' + l
 
+    print d
+    print tmppath
+
     if not tmppath == path:
         d = Dir(tmppath, exclude_file='.gitignore')
 
@@ -16,6 +21,21 @@ def getHTMLItems(d, l):
         for file in files:
         	html += '<li class="dhtmlgoodies_sheet.gif"><a href="#">' + file + '</a></li>'
     else:
+        pass
+
+    return html
+
+
+def testHTMLItems(d):
+    html = ''
+
+    try:
+        files = [f for f in listdir(d) if isfile(join(d,f))]
+
+        for file in files:
+            html += '<li class="dhtmlgoodies_sheet.gif"><a href="#">' + file + '</a></li>'
+
+    except:
         pass
 
     return html
@@ -32,7 +52,8 @@ def createHTML(d, first):
             res += '<li><a href="#">' + l + '</a>'
             res += createHTML(os.path.join(d,l), False)
             if not first:
-                res += getHTMLItems(d, l)
+                # res += getHTMLItems(d, l)
+                res += testHTMLItems(d)
             res += '</li>'
     res += '</ul>'
     html = res.replace('<ul></ul>', '')
