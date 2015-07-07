@@ -251,6 +251,8 @@ def getCase():
                     DIR = functions.askInput('Enter path', 's')
                     if not os.path.exists(DIR):
                         print('\n [ERROR]: Dir does not exist!\n')
+                    if DIR.lower() == 'exit':
+                        break
                     else:
                         scanPath = DIR
                         printWelcomeScreen()
@@ -315,7 +317,7 @@ def getCase():
                 printWelcomeScreen()
             except:
                 printWelcomeScreen()
-                print ' Something goes wrong, try again later!\n'
+                print ' [INFO]: Scan malware checker aborted!\n'
         else:
             print '\n Wrong input, try again!\n'
 
