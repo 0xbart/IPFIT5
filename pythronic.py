@@ -958,6 +958,8 @@ def scanComputerHistory(casename, eName):
 def scanComputerSoftware(casename, eName):
     result = False
 
+    softwarelist = []
+
     try:
         if _platform == 'win32':
             uninstall = ConnectRegistry(None, HKEY_LOCAL_MACHINE)
@@ -988,8 +990,11 @@ def scanComputerSoftware(casename, eName):
             cursor = db.cursor()
 
             for software in uniquelist:
-                cursor.execute('INSERT INTO `' + eName + '_software` ('
-                            	'name) VALUES (?)', (software[0]))
+                try:
+                    cursor.execute('INSERT INTO `' + eName + '_software` ('
+                            	'name) VALUES (?)', (software[0],))
+                except:
+                    pass
 
             db.commit()
             result = True
