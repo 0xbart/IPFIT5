@@ -786,7 +786,7 @@ def scanComputerHistoryChromeWin(name, dest):
         chrome = ("C:\\Users\%s\AppData\Local\Google\Chrome\User Data\Default\History" % name)
         shutil.copy2(chrome, dest)
         destSl = dest + opeSysSlash
-        os.rename(destSl + 'places.sqlite', destSl + 'chrome_history')
+        os.rename(destSl + 'History', destSl + 'Chrome_History')
         result = True
     except:
         pass
@@ -801,7 +801,7 @@ def scanComputerHistoryChromeLinux(name, dest):
         chrome = ("/home/%s/.config/google-chrome/Default/History" % name)
         shutil.copy2(chrome, dest)
         destSl = dest + opeSysSlash
-        os.rename(destSl + 'places.sqlite', destSl + 'chrome_history')
+        os.rename(destSl + 'History', destSl + 'Chrome_History')
         result = True
     except:
         pass
@@ -816,7 +816,7 @@ def scanComputerHistoryChromeOsx(name, dest):
         chrome = ("/Users/%s/Library/Application Support/Google/Chrome/Default//History" % name)
         shutil.copy2(chrome, dest)
         destSl = dest + opeSysSlash
-        os.rename(destSl + 'places.sqlite', destSl + 'chrome_history')
+        os.rename(destSl + 'History', destSl + 'Chrome_History')
         result = True
     except:
         pass
@@ -831,20 +831,14 @@ def scanComputerHistoryIe(name, dest):
         if os.path.isfile("C:\\Users\%s\AppData\Local\Microsoft\Internet Explorer\IECompatData\\" % name):
             internet = ("C:\\Users\%s\AppData\Local\Microsoft\Internet Explorer\IECompatData\\" % name)
             shutil.copy2(internet, dest)
-            destSl = dest + opeSysSlash
-            os.rename(destSl + 'places.sqlite', destSl + 'IE_webcache')
             result = True
         if os.path.isfile("C:\\Users\%s\AppData\Local\Microsoft\Windows\History\\" % name):
             internet = ("C:\\Users\%s\AppData\Local\Microsoft\Windows\History\\" % name)
             shutil.copy2(internet, dest)
-            destSl = dest + opeSysSlash
-            os.rename(destSl + 'places.sqlite', destSl + 'IE_webcache')
             result = True
         if os.path.isfile("C:\\Users\%s\AppData\Local\Microsoft\Windows\WebCache\\" % name):
             internet = ("C:\\Users\%s\AppData\Local\Microsoft\Windows\WebCache\\" % name)
             shutil.copy2(internet, dest)
-            destSl = dest + opeSysSlash
-            os.rename(destSl + 'places.sqlite', destSl + 'IE_webcache')
             result = True
     except:
         pass
@@ -945,7 +939,6 @@ def scanComputerHistory(casename, eName):
                 his_ff = 1
 
         test = getCaseDatabase(casename)
-        print test
         db = sqlite3.connect(test)
         cursor = db.cursor()
         cursor.execute('INSERT INTO `' + eName + '_browser` ('
