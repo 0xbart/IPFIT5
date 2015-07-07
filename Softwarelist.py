@@ -1,13 +1,16 @@
 from _winreg import *
 import os
 import win32api
+import sqlite3
+import pythronic
 
 softwarelist = []
 
 # Search first registry
 
 
-def readfirst():
+def scanComputerSoftware(casename, eName):
+
     uninstall = ConnectRegistry(None, HKEY_LOCAL_MACHINE)
     regcontent = OpenKey(uninstall, r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall")
     for i in range(1024):
@@ -21,8 +24,6 @@ def readfirst():
 
 # Search second registry
 
-
-def readsecond():
     uninstall = ConnectRegistry(None, HKEY_LOCAL_MACHINE)
     regcontent = OpenKey(uninstall, r"SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall")
     for i in range(1024):
@@ -33,10 +34,16 @@ def readsecond():
             softwarelist.append(entries)
         except WindowsError:
             pass
-    print "These programs are recorded in the registry (for this user only) :"
     uniquelist = list(set(softwarelist))
     uniquelist.sort()
-    print uniquelist
 
-readfirst()
-readsecond()
+    for i in uniquelist:
+		db = sqlite3.connect(pythronic.getCaseDatabase(casename))
+		cursor = db.cursor()
+		cursor.execute('INSERT INTO `' + eName + '_software` ('
+			'name) '
+			'VALUES (?,?)', (
+			i))
+		db.commit()
+		
+scanComputerSoftware('cloud', 'laptop')
