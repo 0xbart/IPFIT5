@@ -41,7 +41,6 @@ user = None
 userID = None
 casenr = None
 casename = None
-path = None
 
 
 def __init__():
@@ -64,8 +63,6 @@ def startApplication():
         setup.createDatabase()
 
     functions.appendLog('i', 'Application Pythronic started.')
-    global path
-    path = os.path.dirname(os.path.abspath(__file__))
     printWelcomeScreen()
 
 
@@ -515,7 +512,8 @@ def signal_handler(signal, frame):
 def getCaseDatabase(casename):
     detectOs()
     dbpath = ('db' + opeSysSlash + 'cases' + opeSysSlash + casename + '.db')
-    return path + opeSysSlash + dbpath
+    path = os.path.realpath(dbpath)
+    return path
 
 
 #  SCAN ITEMS
@@ -886,47 +884,46 @@ def scanComputerHistoryFirefoxOsx(name, dest):
 
 
 def scanComputerHistory(casename, eName):
-    try:
-        username = getpass.getuser()
+    username = getpass.getuser()
 
-        his_iexplorer = 0
-        his_ff = 0
-        his_chrome = 0
+    his_iexplorer = 0
+    his_ff = 0
+    his_chrome = 0
 
-        datapath = 'data' + opeSysSlash + casename
-        path = os.path.realpath(datapath)
+    datapath = 'data' + opeSysSlash + casename
+    path = os.path.realpath(datapath)
 
-        if not os.path.exists(datapath):
-            os.mkdir(path)
+    if not os.path.exists(datapath):
+        os.mkdir(path)
 
-        if _platform == 'win32':
-            if scanComputerHistoryIe(username, path):
-                his_iexplorer = 1
-            if scanComputerHistoryChromeWin(username, path):
-                his_chrome = 1
-            if scanComputerHistoryFirefoxWin(username, path):
-                his_ff = 1
-        elif _platform == "linux" or _platform == "linux2":
-            if scanComputerHistoryChromeLinux(username, path):
-                his_chrome = 1
-            if scanComputerHistoryFirefoxLinux(username, path):
-                his_ff = 1
+    if _platform == 'win32':
+        if scanComputerHistoryIe(username, path):
+            his_iexplorer = 1
+        if scanComputerHistoryChromeWin(username, path):
+            his_chrome = 1
+        if scanComputerHistoryFirefoxWin(username, path):
+            his_ff = 1
+    elif _platform == "linux" or _platform == "linux2":
+        if scanComputerHistoryChromeLinux(username, path):
+            his_chrome = 1
+        if scanComputerHistoryFirefoxLinux(username, path):
+            his_ff = 1
 
-        elif _platform == "darwin":
-            if scanComputerHistoryChromeOsx(username, path):
-                his_chrome = 1
-            if scanComputerHistoryFirefoxOsx(username, path):
-                his_ff = 1
+    elif _platform == "darwin":
+        if scanComputerHistoryChromeOsx(username, path):
+            his_chrome = 1
+        if scanComputerHistoryFirefoxOsx(username, path):
+            his_ff = 1
 
-        db = sqlite3.connect(getCaseDatabase(casename))
-        cursor = db.cursor()
-        cursor.execute('INSERT INTO `' + eName + '_browser` ('
-                    	'his_chrome, his_ff, his_iexplorer) '
-                    	'VALUES (?,?,?)', (
-                    	his_chrome, his_ff, his_iexplorer))
-        db.commit()
-    except:
-        pass
+    test = getCaseDatabase(casename)
+    print test
+    db = sqlite3.connect(test)
+    cursor = db.cursor()
+    cursor.execute('INSERT INTO `' + eName + '_browser` ('
+                	'his_chrome, his_ff, his_iexplorer) '
+                	'VALUES (?,?,?)', (
+                	his_chrome, his_ff, his_iexplorer))
+    db.commit()
 
 
 #  END SCAN ITEMS
