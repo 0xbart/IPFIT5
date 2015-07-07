@@ -6,27 +6,8 @@ import os
 
 path = '/Users/Bart/Downloads/folder-tree-static/_TEST/zzz'
 
-def getHTMLItems(d, l):
-    html = ''
-    tmppath = d + '/' + l
 
-    print d
-    print tmppath
-
-    if not tmppath == path:
-        d = Dir(tmppath, exclude_file='.gitignore')
-
-        files = d.files()
-
-        for file in files:
-        	html += '<li class="dhtmlgoodies_sheet.gif"><a href="#">' + file + '</a></li>'
-    else:
-        pass
-
-    return html
-
-
-def testHTMLItems(d):
+def createHTMLFiles(d):
     html = ''
 
     try:
@@ -34,7 +15,6 @@ def testHTMLItems(d):
 
         for file in files:
             html += '<li class="dhtmlgoodies_sheet.gif"><a href="#">' + file + '</a></li>'
-
     except:
         pass
 
@@ -46,17 +26,22 @@ def createHTML(d, first):
         res = ''
     else:
         res = '<ul>'
+
     lds = os.listdir(d)
+
     for l in lds:
         if os.path.isdir(os.path.join(d,l)):
             res += '<li><a href="#">' + l + '</a>'
             res += createHTML(os.path.join(d,l), False)
             if not first:
-                # res += getHTMLItems(d, l)
-                res += testHTMLItems(d)
+                res += createHTMLFiles(d)
             res += '</li>'
+
+    if first:
+        res += createHTMLFiles(path)
     res += '</ul>'
     html = res.replace('<ul></ul>', '')
+
     return html
 
 
