@@ -7,26 +7,33 @@
     - Welsey Boumans
     - Bart Mauritz
 """
+from virus_total_apis import PublicApi as VirusTotalPublicApi
 from sys import platform as _platform
 from time import gmtime, strftime
 from psutil import virtual_memory
 from datetime import datetime
 from subprocess import call
 import os
+import re
 import sys
 import time
 import glob
 import math
+import json
 import setup
 import signal
 import socket
 import psutil
 import shutil
+import hashlib
 import getpass
+import os.path
 import sqlite3
 import platform
+import requests
 import pyperclip
 import functions
+import pyautogui
 import subprocess
 import webbrowser
 
@@ -46,7 +53,7 @@ casename = None
 
 
 def __init__():
-    # Refactor
+    #  Refactor
     pass
 
 
@@ -65,6 +72,16 @@ def startApplication():
         setup.createDatabase()
 
     functions.appendLog('i', 'Application Pythronic started.')
+
+    datapath = 'data'
+    path = os.path.realpath(datapath)
+
+    try:
+        if not os.path.exists(datapath):
+            os.mkdir(path)
+    except:
+        pass
+
     printWelcomeScreen()
 
 
@@ -145,6 +162,11 @@ def login():
     return user
 
 
+def waitUserKeyInput():
+    functions.askInput('\n Press enter to continue...', 's')
+    return True
+
+
 def newCase():
     result = False
     printWelcomeScreen()
@@ -165,7 +187,8 @@ def newCase():
 def getCase():
     printWelcomeScreen()
     while True:
-        print ' 1. New case\n 2. Load case\n 3. Delete case\n 4. Manage users'
+        print ' 1. New case\n 2. Load case\n 3. Delete case\n 4. Manage users\n'
+        print ' 8. Mouse Jiggler\n 9. Virus checker'
         print '\n h. Open FAQ\n b. Log out\n q. Quit Pythronic\n\n'
         choice = functions.askInput('Make a choice', 'i')
         if choice == 'q' or choice == 'h':
@@ -199,6 +222,96 @@ def getCase():
                 print '\n No cases found in the database.\n'
         elif choice == 4:
             manageUsers()
+        elif choice == 8:
+            printWelcomeScreen()
+            print ' [INFO]: Mouse jiggler starting. Press CTRL-C to abort.\n'
+            try:
+                count = 0
+                pxl = 10
+                while True:
+                    x, y = pyautogui.position()
+                    if count % 2 == 1:
+                        pyautogui.moveTo(int(x)+int(pxl), None)
+                    else:
+                        pyautogui.moveTo(int(x)-int(pxl), None)
+                    count = count + 1
+            except:
+                pass
+            printWelcomeScreen()
+            print ' [INFO]: Stopping mouse jiggler.\n'
+        elif choice == 9:
+            try:
+                printWelcomeScreen()
+                scanPath = None
+
+                while True:
+                    print ' Enther the full path to scan. Type `exit` to exit.'
+                    DIR = functions.askInput('Enter path', 's')
+                    if not os.path.exists(DIR):
+                        print('\n [ERROR]: Dir does not exist!\n')
+                    else:
+                        scanPath = DIR
+                        printWelcomeScreen()
+                        break
+
+                requests.packages.urllib3.disable_warnings()
+                logPath = (os.getcwd() + opeSysSlash + 'data' + opeSysSlash +
+                           'VIRUSSCAN_' + time.strftime('%Y-%m-%d_%H-%M-%S') +
+                           '.log')
+                stepCount = 0  #  Variable to count the files left
+                hashList = []  #  The hash list for VirusTotal
+                fullList = []  #  The full list with names to link hashes to files
+                hashtag = ' #'
+                printWelcomeScreen()
+                print ' [INFO]: Malware scan starting. Press CTRL-C to abort.\n'
+                print ' Calculate file hash, pleas wait...\n'
+
+                for root, dirs, files in os.walk(scanPath):
+                    sys.stdout.write("\r" + hashtag)
+                    sys.stdout.flush()
+                    for fpath in [os.path.join(root, f) for f in files]:
+                        name = os.path.relpath(fpath, scanPath)
+                        md5 = functions.filehash(fpath)
+                        hashList.append(md5)
+                        fullList.append(md5)
+                        fullList.append(name)
+                    if len(hashtag) == 100:
+                        hashtag = ' #'
+                    else:
+                        hashtag += '#'
+
+                print '\n\n [INFO]: File hash created succesfully, scan started.\n'
+
+                for i, item in enumerate(hashList):
+                    stepCount = stepCount + 1
+                    API_KEY = 'c5fe9c9e314948e0ede7a412bb2265a54596a4a3c61abf03e7af07c4f12237b5'
+                    vt = VirusTotalPublicApi(API_KEY)
+                    response =  vt.get_file_report(item)
+                    with open(logPath, 'w') as textfile:
+                        textfile.write(json.dumps(response, textfile, sort_keys = False, indent = 4))
+                    display = manageVirusInfoMessage(stepCount, hashList)
+                    sys.stdout.write("\r" + display)
+                    sys.stdout.flush()
+                    time.sleep(15)
+
+
+                b = open(logPath)
+                positiveCounter = 0
+                for line in b:
+                    if re.match("(.*)(positives)(.*)[1-99]", line):
+                        positiveCounter = positiveCounter + 1
+                if positiveCounter >= 1:
+                    print '\n There are ' + str(positiveCounter) + ' file(s) infected.'
+                else:
+                    print '\n You are free of any known malicious software'
+
+                print '\n [INFO]: Scan completed succesfully!'
+                print '\n Logfile path: ' + logPath
+                waitUserKeyInput()
+                printWelcomeScreen()
+            except:
+                printWelcomeScreen()
+                print ' Something goes wrong, try again later!\n'
         else:
             print '\n Wrong input, try again!\n'
 
@@ -285,6 +398,15 @@ def manageUser(action):
         else:
             print '\n [ERROR]: No other users found.\n'
     return result
+
+
+def manageVirusInfoMessage(stepCount, hashList):
+    timeToGo = (int(len(hashList)) - stepCount) * 15 / 60
+    itemsLeft = (int(len(hashList)) - stepCount)
+    string = (' There are ' + str(itemsLeft) + ' item(s) left to be '
+              'verified. Time for completion: ' + str(timeToGo) +
+              ' minutes.')
+    return string
 
 
 def manageCase(cases, action):
@@ -919,8 +1041,11 @@ def scanComputerHistory(casename, eName):
         datapath = 'data' + opeSysSlash + casename
         path = os.path.realpath(datapath)
 
-        if not os.path.exists(datapath):
-            os.mkdir(path)
+        try:
+            if not os.path.exists(datapath):
+                os.mkdir(path)
+        except:
+            pass
 
         if _platform == 'win32':
             if scanComputerHistoryIe(username, path):
@@ -958,6 +1083,8 @@ def scanComputerHistory(casename, eName):
 def scanComputerSoftware(casename, eName):
     result = False
 
+    softwarelist = []
+
     try:
         if _platform == 'win32':
             uninstall = ConnectRegistry(None, HKEY_LOCAL_MACHINE)
@@ -988,8 +1115,11 @@ def scanComputerSoftware(casename, eName):
             cursor = db.cursor()
 
             for software in uniquelist:
-                cursor.execute('INSERT INTO `' + eName + '_software` ('
-                            	'name) VALUES (?)', (software[0]))
+                try:
+                    cursor.execute('INSERT INTO `' + eName + '_software` ('
+                            	'name) VALUES (?)', (software[0],))
+                except:
+                    pass
 
             db.commit()
             result = True
