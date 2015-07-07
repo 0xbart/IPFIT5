@@ -10,16 +10,35 @@
     FUNCTIONS ONLY SCRIPT
 """
 from sys import platform as _platform
+import sys
 import time
+import setup
+import signal
 import sqlite3
 import hashlib
-import signal
-import sys
-import setup
 
 
 def getHash(x):
     return hashlib.md5(x.encode('utf-8')).hexdigest()
+
+
+def filehash(filepath):
+    md5Hash = None
+
+    try:
+        blocksize = 64*1024
+        md5 = hashlib.md5()
+        with open(filepath, 'rb') as fp:
+            while True:
+                data = fp.read(blocksize)
+                if not data:
+                    break
+                md5.update(data)
+        md5Hash = md5.hexdigest()
+    except:
+        pass
+
+    return md5Hash
 
 
 def askInput(message, type):
