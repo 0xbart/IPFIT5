@@ -544,6 +544,9 @@ def startScan(casename, eName, eType):
         if scanComputerHistory(casename, eName):
             print ' [X] History settings completed.'
 
+        if scanComputerSoftware(casename, eName):
+            print ' [X] Software settings completed.'
+
         stop = functions.askInput('halt!', 's')
 
         result = True
@@ -938,8 +941,7 @@ def scanComputerHistory(casename, eName):
             if scanComputerHistoryFirefoxOsx(username, path):
                 his_ff = 1
 
-        test = getCaseDatabase(casename)
-        db = sqlite3.connect(test)
+        db = sqlite3.connect(getCaseDatabase(casename))
         cursor = db.cursor()
         cursor.execute('INSERT INTO `' + eName + '_browser` ('
                     	'his_chrome, his_ff, his_iexplorer) '
@@ -947,6 +949,50 @@ def scanComputerHistory(casename, eName):
                     	his_chrome, his_ff, his_iexplorer))
         db.commit()
         result = True
+    except:
+        pass
+
+    return result
+
+
+def scanComputerSoftware(casename, eName):
+    result = False
+
+    try:
+        if _platform == 'win32':
+            uninstall = ConnectRegistry(None, HKEY_LOCAL_MACHINE)
+            regcontent = OpenKey(uninstall, r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall")
+            for i in range(1024):
+                try:
+                    keyname = EnumKey(regcontent, i)
+                    regdata = OpenKey(regcontent, keyname)
+                    entries = QueryValueEx(regdata, "DisplayName")
+                    softwarelist.append(entries)
+                except WindowsError:
+                    pass
+
+            uninstall = ConnectRegistry(None, HKEY_LOCAL_MACHINE)
+            regcontent = OpenKey(uninstall, r"SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall")
+            for i in range(1024):
+                try:
+                    keyname = EnumKey(regcontent, i)
+                    asubkey = OpenKey(regcontent, keyname)
+                    entries = QueryValueEx(asubkey, "DisplayName")
+                    softwarelist.append(entries)
+                except WindowsError:
+                    pass
+            uniquelist = list(set(softwarelist))
+            uniquelist.sort()
+
+            db = sqlite3.connect(getCaseDatabase(casename))
+            cursor = db.cursor()
+
+            for software in uniquelist:
+                cursor.execute('INSERT INTO `' + eName + '_software` ('
+                            	'name) VALUES (?)', (software[0]))
+
+            db.commit()
+            result = True
     except:
         pass
 
