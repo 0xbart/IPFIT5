@@ -394,6 +394,7 @@ def manageUser(action):
                         if confirm.lower() == 'y' or confirm.lower() == 'p':
                             functions.deleteUser(str(choice), confirm.lower())
                             result = True
+                        printWelcomeScreen()
                         break
                     else:
                         print '\n You cannot delete yourself!\n'
