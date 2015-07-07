@@ -4,7 +4,7 @@ from os.path import isfile, join
 import os.path
 import os
 
-path = '/Users/Bart/Downloads/folder-tree-static/_TEST/zzz'
+path = '/Users/Prestin/Downloads'
 
 
 def createHTMLFiles(d):
