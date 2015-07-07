@@ -11,6 +11,7 @@ from sys import platform as _platform
 from time import gmtime, strftime
 from psutil import virtual_memory
 from datetime import datetime
+from subprocess import call
 import os
 import sys
 import time
@@ -26,7 +27,6 @@ import pyperclip
 import functions
 import subprocess
 import webbrowser
-from subprocess import call
 
 try:
     from _winreg import *
@@ -441,7 +441,7 @@ def menu():
                         dtime = time.strftime("%Y-%m-%d %H:%M:%S")
                         overview = ('\n Scan will start now on (' + dtime + ')'
                                     ' on (case: ' + casename + ', evidence: ' +
-                                    eName + ') by user ' + user+ '.')
+                                    eName + ') by user ' + user + '.')
                         confirm = ('Are you authorized to do this? '
                                    'Press Y to proceed')
                         choiceScan = functions.askInput(confirm, 's')
@@ -533,6 +533,9 @@ def startScan(casename, eName, eType):
 
         if scanComputerStartup(casename, eName):
             print ' [X] Startup settings completed.'
+
+        if scanComputerCloud(casename, eName):
+            print ' [X] Cloud settings completed.'
 
         stop = functions.askInput('halt!', 's')
 
@@ -666,6 +669,103 @@ def scanComputerStartup(casename, eName):
             db.commit()
 
             result = True
+    except:
+        pass
+
+    return result
+
+
+def scanComputerCloud(casename, eName):
+    result = False
+
+    try:
+        googledrive = 0
+    	dropbox = 0
+    	onedrive = 0
+    	evernote = 0
+
+        if _platform == 'win32':
+    		if os.path.isdir("C:\\Program Files (x86)\\Google\\Drive"):
+    			googledrive = 1
+    		for p in psutil.process_iter():
+    			try:
+    				if p.name() == 'googledrivesync.exe':
+    					googledrive = 1
+    			except psutil.Error:
+    				pass
+
+    		if os.path.isdir("C:\\Program Files (x86)\\dropbox"):
+    			dropbox = 1
+    		else :
+    			for p in psutil.process_iter():
+    				try:
+    					if p.name() == 'dropbox.exe':
+    						dropbox = 1
+    						dropbox.append(p)
+    				except psutil.Error:
+    					pass
+
+
+    		if os.path.isdir("C:\\Program Files (x86)\\Microsoft onedrive"):
+    			onedrive = 1
+    			for p in psutil.process_iter():
+    				try:
+    					if p.name() == 'onedrive.exe':
+    						onedrive = 1
+    						one_drive.append(p)
+    				except psutil.Error:
+    					pass
+
+
+    		if os.path.isdir("C:\\Program Files (x86)\\evernote"):
+    			evernote = 1
+    			for p in psutil.process_iter():
+    				try:
+    					if p.name() == 'evernote.exe':
+    						evernote = 1
+    						evernote.append(p)
+    				except psutil.Error:
+    					pass
+
+    	if _platform == 'linux' or _platform == 'linux2' or _platform == "darwin":
+    		for p in psutil.process_iter():
+    				try:
+    					if p.name() == 'Google Drive':
+    						googledrive = 1
+    				except psutil.Error:
+    					pass
+
+    		for p in psutil.process_iter():
+    				try:
+    					if p.name() == 'Dropbox':
+    						dropbox = 1
+    				except psutil.Error:
+    					pass
+
+    		for p in psutil.process_iter():
+    				try:
+    					if p.name() == 'OneDrive':
+    						onedrive = 1
+    				except psutil.Error:
+    					pass
+
+    		for p in psutil.process_iter():
+    				try:
+    					if p.name() == 'Evernote':
+    						evernote = 1
+    				except psutil.Error:
+    					pass
+
+        db = sqlite3.connect(getCaseDatabase(casename))
+        cursor = db.cursor()
+        cursor.execute('INSERT INTO `' + eName + '_cloud` ('
+			'googledrive, dropbox, onedrive, evernote) '
+			'VALUES (?,?,?,?)', (
+			googledrive, dropbox, onedrive, evernote))
+        db.commit()
+
+        result = True
+
     except:
         pass
 

@@ -165,7 +165,7 @@ def createEvidenceTables(name, casename, evidenceType):
                 'connected_ip TEXT)',  # 5
                 'CREATE TABLE `' + name + '_cloud` ('
                 'id INTEGER PRIMARY KEY, dropbox INTEGER, '
-                'onenote INTEGER, evernote INTEGER, googledrive INTEGER)',  # 6
+                'onedrive INTEGER, evernote INTEGER, googledrive INTEGER)',  # 6
                 'CREATE TABLE `' + name + '_virus` ('
                 'id INTEGER PRIMARY KEY, virus_name TEXT, '
                 'virus_hash TEXT, virus_output TEXT)',  # 7
