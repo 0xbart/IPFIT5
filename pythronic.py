@@ -334,7 +334,8 @@ def manageUsers():
             if choice == 1:
                 if manageUser('new'):
                     printWelcomeScreen()
-                    print ' User succesfully added to the database.\n\n'
+                    print (' [INFO]: User succesfully added to the '
+                           'database.\n')
             if choice == 2:
                 if manageUser('delete'):
                     printWelcomeScreen()
@@ -352,23 +353,22 @@ def manageUser(action):
             while True:
                 username = functions.askInput('Enter username', 's')
                 if len(username) >= 4:
-                    print(len(username))
                     if not functions.checkUserExist(username):
                         break
                     else:
                         print '\n [ERROR]: Username exist, try another name.\n'
                 else:
                     print ' [ERROR]: Username must be longer then 3 char.\n'
-                password = functions.askInput('Enter password', 's')
-                if len(username) >= 4:
-                    if functions.createUser(username, password):
-                        result = True
-                        break
-                    else:
-                        print '\n [ERROR]: User cannot be created!\n'
-                        break
+            password = functions.askInput('Enter password', 's')
+            if len(username) >= 4:
+                if functions.createUser(username, password):
+                    result = True
+                    break
                 else:
-                    print ' [ERROR]: Choose a password longer then 3 char.\n'
+                    print '\n [ERROR]: User cannot be created!\n'
+                    break
+            else:
+                print ' [ERROR]: Choose a password longer then 3 char.\n'
 
     elif action == 'delete':
         users = functions.getUsers()
