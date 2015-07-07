@@ -271,18 +271,16 @@ def getCase():
                 print ' Calculate file hash, pleas wait...\n'
 
                 for root, dirs, files in os.walk(scanPath):
-                    sys.stdout.write("\r" + hashtag)
-                    sys.stdout.flush()
+                    if len(hashtag) < 100:
+                        sys.stdout.write("\r" + hashtag)
+                        sys.stdout.flush()
                     for fpath in [os.path.join(root, f) for f in files]:
                         name = os.path.relpath(fpath, scanPath)
                         md5 = functions.filehash(fpath)
                         hashList.append(md5)
                         fullList.append(md5)
                         fullList.append(name)
-                    if len(hashtag) == 100:
-                        hashtag = ' #'
-                    else:
-                        hashtag += '#'
+                    hashtag += '#'
 
                 print '\n\n [INFO]: File hash succesfully, scan started.\n'
 
