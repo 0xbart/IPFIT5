@@ -51,6 +51,8 @@ userID = None
 casenr = None
 casename = None
 
+VTotalAPI = 'c5fe9c9e314948e0ede7a412bb2265a54596a4a3c61abf03e7af07c4f12237b5'
+
 
 def __init__():
     #  Refactor
@@ -187,8 +189,8 @@ def newCase():
 def getCase():
     printWelcomeScreen()
     while True:
-        print ' 1. New case\n 2. Load case\n 3. Delete case\n 4. Manage users\n'
-        print ' 8. Mouse Jiggler\n 9. Virus checker'
+        print ' 1. New case\n 2. Load case\n 3. Delete case\n 4. Manage users'
+        print '\n 8. Mouse Jiggler\n 9. Virus checker'
         print '\n h. Open FAQ\n b. Log out\n q. Quit Pythronic\n\n'
         choice = functions.askInput('Make a choice', 'i')
         if choice == 'q' or choice == 'h':
@@ -258,12 +260,12 @@ def getCase():
                 logPath = (os.getcwd() + opeSysSlash + 'data' + opeSysSlash +
                            'VIRUSSCAN_' + time.strftime('%Y-%m-%d_%H-%M-%S') +
                            '.log')
-                stepCount = 0  #  Variable to count the files left
-                hashList = []  #  The hash list for VirusTotal
-                fullList = []  #  The full list with names to link hashes to files
+                stepCount = 0
+                hashList = []
+                fullList = []
                 hashtag = ' #'
                 printWelcomeScreen()
-                print ' [INFO]: Malware scan starting. Press CTRL-C to abort.\n'
+                print ' [INFO]: Malware scan starting;  CTRL-C to abort.\n'
                 print ' Calculate file hash, pleas wait...\n'
 
                 for root, dirs, files in os.walk(scanPath):
@@ -280,20 +282,21 @@ def getCase():
                     else:
                         hashtag += '#'
 
-                print '\n\n [INFO]: File hash created succesfully, scan started.\n'
+                print '\n\n [INFO]: File hash succesfully, scan started.\n'
 
                 for i, item in enumerate(hashList):
                     stepCount = stepCount + 1
-                    API_KEY = 'c5fe9c9e314948e0ede7a412bb2265a54596a4a3c61abf03e7af07c4f12237b5'
-                    vt = VirusTotalPublicApi(API_KEY)
-                    response =  vt.get_file_report(item)
+                    vt = VirusTotalPublicApi(VTotalAPI)
+                    response = vt.get_file_report(item)
                     with open(logPath, 'w') as textfile:
-                        textfile.write(json.dumps(response, textfile, sort_keys = False, indent = 4))
+                        textfile.write(json.dumps(response,
+                                                  textfile,
+                                                  sort_keys=False,
+                                                  indent=4))
                     display = manageVirusInfoMessage(stepCount, hashList)
                     sys.stdout.write("\r" + display)
                     sys.stdout.flush()
                     time.sleep(15)
-
 
                 b = open(logPath)
                 positiveCounter = 0
@@ -301,7 +304,8 @@ def getCase():
                     if re.match("(.*)(positives)(.*)[1-99]", line):
                         positiveCounter = positiveCounter + 1
                 if positiveCounter >= 1:
-                    print '\n There are ' + str(positiveCounter) + ' file(s) infected.'
+                    count = str(positiveCounter)
+                    print '\n There are ' + count + ' file(s) infected.'
                 else:
                     print '\n You are free of any known malicious software'
 
@@ -691,10 +695,11 @@ def scanComputerGeneral(casename, eName):
         username = getpass.getuser()
         db = sqlite3.connect(getCaseDatabase(casename))
         cursor = db.cursor()
-        cursor.execute('INSERT INTO `' + eName + '_general` ('
-            'os, ddate, ttime, timezone, clip_out, pc_name, username) '
-            'VALUES (?,?,?,?,?,?,?)', (
-            opeSys, ddate, ttime, timezone, clipboard, computername, username))
+        cursor.execute('INSERT INTO `' + eName + '_general`'
+                       '(os, ddate, ttime, timezone, clip_out, pc_name, '
+                       'username) VALUES (?,?,?,?,?,?,?)',
+                       (opeSys, ddate, ttime, timezone, clipboard,
+                        computername, username))
         db.commit()
 
         result = True
@@ -717,9 +722,10 @@ def scanComputerHardware(casename, eName):
             db = sqlite3.connect(getCaseDatabase(casename))
             cursor = db.cursor()
             cursor.execute('INSERT INTO `' + eName + '_hardware` ('
-                'processor, system_arch, total_memory) '
-                'VALUES (?,?,?)', (
-                str(processor), str(system_arch), str(total_memory)))
+                           'processor, system_arch, total_memory) '
+                           'VALUES (?,?,?)',
+                           (str(processor), str(system_arch),
+                            str(total_memory)))
             db.commit()
 
             result = True
@@ -732,9 +738,9 @@ def scanComputerHardware(casename, eName):
             db = sqlite3.connect(getCaseDatabase(casename))
             cursor = db.cursor()
             cursor.execute('INSERT INTO `' + eName + '_hardware` ('
-                'processor, system_arch, proc_name, proc_family) '
-                'VALUES (?,?,?,?)', (
-                processor, system_arch, proc_name, proc_family))
+                           'processor, system_arch, proc_name, proc_family) '
+                           'VALUES (?,?,?,?)',
+                           (processor, system_arch, proc_name, proc_family))
             db.commit()
 
             result = True
@@ -754,10 +760,10 @@ def scanComputerHardware(casename, eName):
             db = sqlite3.connect(getCaseDatabase(casename))
             cursor = db.cursor()
             cursor.execute('INSERT INTO `' + eName + '_hardware` ('
-                'processor, system_arch, proc_family, used_memory, '
-                'free_memory, total_memory) VALUES (?,?,?,?,?,?)',
-                (processor, system_arch, proc_family, used_memory,
-                 free_memory, total_memory))
+                           'processor, system_arch, proc_family, used_memory, '
+                           'free_memory, total_memory) VALUES (?,?,?,?,?,?)',
+                           (processor, system_arch, proc_family, used_memory,
+                            free_memory, total_memory))
             db.commit()
 
             result = True
@@ -772,11 +778,11 @@ def scanComputerStartup(casename, eName):
 
     try:
         if opeSys == 'linux' or opeSys == 'linux2':
-            items = subprocess.call(['initctl show-config'], shell = True)
+            items = subprocess.call(['initctl show-config'], shell=True)
             db = sqlite3.connect(getCaseDatabase(casename))
             cursor = db.cursor()
             cursor.execute('INSERT INTO `' + eName + '_linux_logon` ('
-                'name) VALUES (?)', (items))
+                           'name) VALUES (?)', (items))
             db.commit()
             result = True
         elif opeSys == 'win32' or opeSys == 'windows':
@@ -796,7 +802,7 @@ def scanComputerStartup(casename, eName):
 
             for i in range(len(startUpItems)):
                 cursor.execute('INSERT INTO `' + eName + '_win_logon` ('
-                    'name) VALUES (?)', (str(startUpItems[i]),))
+                               'name) VALUES (?)', (str(startUpItems[i]),))
 
             db.commit()
 
@@ -812,88 +818,85 @@ def scanComputerCloud(casename, eName):
 
     try:
         googledrive = 0
-    	dropbox = 0
-    	onedrive = 0
-    	evernote = 0
+        dropbox = 0
+        onedrive = 0
+        evernote = 0
 
         if _platform == 'win32':
-    		if os.path.isdir("C:\\Program Files (x86)\\Google\\Drive"):
-    			googledrive = 1
-    		for p in psutil.process_iter():
-    			try:
-    				if p.name() == 'googledrivesync.exe':
-    					googledrive = 1
-    			except psutil.Error:
-    				pass
+            if os.path.isdir("C:\\Program Files (x86)\\Google\\Drive"):
+                googledrive = 1
+            for p in psutil.process_iter():
+                try:
+                    if p.name() == 'googledrivesync.exe':
+                        googledrive = 1
+                except psutil.Error:
+                    pass
 
-    		if os.path.isdir("C:\\Program Files (x86)\\dropbox"):
-    			dropbox = 1
-    		else :
-    			for p in psutil.process_iter():
-    				try:
-    					if p.name() == 'dropbox.exe':
-    						dropbox = 1
-    						dropbox.append(p)
-    				except psutil.Error:
-    					pass
+            if os.path.isdir("C:\\Program Files (x86)\\dropbox"):
+                dropbox = 1
+            else:
+                for p in psutil.process_iter():
+                    try:
+                        if p.name() == 'dropbox.exe':
+                            dropbox = 1
+                            dropbox.append(p)
+                    except psutil.Error:
+                        pass
 
+            if os.path.isdir("C:\\Program Files (x86)\\Microsoft onedrive"):
+                onedrive = 1
+                for p in psutil.process_iter():
+                    try:
+                        if p.name() == 'onedrive.exe':
+                            onedrive = 1
+                            one_drive.append(p)
+                    except psutil.Error:
+                        pass
 
-    		if os.path.isdir("C:\\Program Files (x86)\\Microsoft onedrive"):
-    			onedrive = 1
-    			for p in psutil.process_iter():
-    				try:
-    					if p.name() == 'onedrive.exe':
-    						onedrive = 1
-    						one_drive.append(p)
-    				except psutil.Error:
-    					pass
+            if os.path.isdir("C:\\Program Files (x86)\\evernote"):
+                evernote = 1
+                for p in psutil.process_iter():
+                    try:
+                        if p.name() == 'evernote.exe':
+                            evernote = 1
+                            evernote.append(p)
+                    except psutil.Error:
+                        pass
 
+        if _platform == 'linux' or _platform == "darwin":
+            for p in psutil.process_iter():
+                try:
+                    if p.name() == 'Google Drive':
+                        googledrive = 1
+                except psutil.Error:
+                    pass
 
-    		if os.path.isdir("C:\\Program Files (x86)\\evernote"):
-    			evernote = 1
-    			for p in psutil.process_iter():
-    				try:
-    					if p.name() == 'evernote.exe':
-    						evernote = 1
-    						evernote.append(p)
-    				except psutil.Error:
-    					pass
+            for p in psutil.process_iter():
+                try:
+                    if p.name() == 'Dropbox':
+                        dropbox = 1
+                except psutil.Error:
+                    pass
 
-    	if _platform == 'linux' or _platform == 'linux2' or _platform == "darwin":
-    		for p in psutil.process_iter():
-    				try:
-    					if p.name() == 'Google Drive':
-    						googledrive = 1
-    				except psutil.Error:
-    					pass
+            for p in psutil.process_iter():
+                try:
+                    if p.name() == 'OneDrive':
+                        onedrive = 1
+                except psutil.Error:
+                    pass
 
-    		for p in psutil.process_iter():
-    				try:
-    					if p.name() == 'Dropbox':
-    						dropbox = 1
-    				except psutil.Error:
-    					pass
-
-    		for p in psutil.process_iter():
-    				try:
-    					if p.name() == 'OneDrive':
-    						onedrive = 1
-    				except psutil.Error:
-    					pass
-
-    		for p in psutil.process_iter():
-    				try:
-    					if p.name() == 'Evernote':
-    						evernote = 1
-    				except psutil.Error:
-    					pass
+            for p in psutil.process_iter():
+                try:
+                    if p.name() == 'Evernote':
+                        evernote = 1
+                except psutil.Error:
+                    pass
 
         db = sqlite3.connect(getCaseDatabase(casename))
         cursor = db.cursor()
-        cursor.execute('INSERT INTO `' + eName + '_cloud` ('
-			'googledrive, dropbox, onedrive, evernote) '
-			'VALUES (?,?,?,?)', (
-			googledrive, dropbox, onedrive, evernote))
+        cursor.execute('INSERT INTO `' + eName + '_cloud` (googledrive, '
+                       'dropbox, onedrive, evernote) VALUES (?,?,?,?)',
+                       (googledrive, dropbox, onedrive, evernote))
         db.commit()
 
         result = True
@@ -908,7 +911,9 @@ def scanComputerHistoryChromeWin(name, dest):
     result = False
 
     try:
-        chrome = ("C:\\Users\%s\AppData\Local\Google\Chrome\User Data\Default\History" % name)
+        path = ("C:\\Users\%s\AppData\Local\Google\Chrome"
+                "\User Data\Default\History")
+        chrome = (path % name)
         shutil.copy2(chrome, dest)
         destSl = dest + opeSysSlash
         os.rename(destSl + 'History', destSl + 'Chrome_History')
@@ -938,7 +943,9 @@ def scanComputerHistoryChromeOsx(name, dest):
     result = False
 
     try:
-        chrome = ("/Users/%s/Library/Application Support/Google/Chrome/Default//History" % name)
+        chromePath = ("/Users/%s/Library/Application Support/"
+                      "Google/Chrome/Default//History")
+        chrome = (chromePath % name)
         shutil.copy2(chrome, dest)
         destSl = dest + opeSysSlash
         os.rename(destSl + 'History', destSl + 'Chrome_History')
@@ -953,16 +960,20 @@ def scanComputerHistoryIe(name, dest):
     result = False
 
     try:
-        if os.path.isfile("C:\\Users\%s\AppData\Local\Microsoft\Internet Explorer\IECompatData\\" % name):
-            internet = ("C:\\Users\%s\AppData\Local\Microsoft\Internet Explorer\IECompatData\\" % name)
+        pathOne = ("C:\\Users\%s\AppData\Local\Microsoft\Internet Explorer"
+                   "\IECompatData\\")
+        pathTwo = ("C:\\Users\%s\AppData\Local\Microsoft\Windows\History\\")
+        pathThree = ("C:\\Users\%s\AppData\Local\Microsoft\Windows\WebCache\\")
+        if os.path.isfile(pathOne % name):
+            internet = (pathOne % name)
             shutil.copy2(internet, dest)
             result = True
-        if os.path.isfile("C:\\Users\%s\AppData\Local\Microsoft\Windows\History\\" % name):
-            internet = ("C:\\Users\%s\AppData\Local\Microsoft\Windows\History\\" % name)
+        if os.path.isfile(pathTwo % name):
+            internet = (pathTwo % name)
             shutil.copy2(internet, dest)
             result = True
-        if os.path.isfile("C:\\Users\%s\AppData\Local\Microsoft\Windows\WebCache\\" % name):
-            internet = ("C:\\Users\%s\AppData\Local\Microsoft\Windows\WebCache\\" % name)
+        if os.path.isfile(pathThree % name):
+            internet = (pahtThree % name)
             shutil.copy2(internet, dest)
             result = True
     except:
@@ -975,9 +986,12 @@ def scanComputerHistoryFirefoxWin(name, dest):
     result = False
 
     try:
-        osfirefox = os.listdir("C:\\Users\%s\AppData\Roaming\Mozilla\Firefox\\Profiles" % name)
+        basePath = ("C:\\Users\%s\AppData\Roaming\Mozilla\Firefox\\Profiles")
+        osfirefox = os.listdir(basePath % name)
         osfirefoxformat = (str(osfirefox)[2:-2])
-        firefox = ("C:\\Users\%s\AppData\Roaming\Mozilla\Firefox\Profiles\%s\\places.sqlite" % (name, osfirefoxformat))
+        firefoxPath = ("C:\\Users\%s\AppData\Roaming\Mozilla\""
+                       "Firefox\Profiles\%s\\places.sqlite")
+        firefox = (firefoxPath % (name, osfirefoxformat))
         shutil.copy2(firefox, dest)
         destSl = dest + opeSysSlash
         os.rename(destSl + 'places.sqlite', destSl + 'firefox_places.sqlite')
@@ -995,10 +1009,11 @@ def scanComputerHistoryFirefoxLinux(name, dest):
     try:
         os.chdir("/home/%s/.mozilla/firefox" % name)
         for file in glob.glob("*.default"):
-            firefox = ("/home/%s/.mozilla/firefox/%s/places.sqlite" % (name, file))
+            firefoxPath = "/home/%s/.mozilla/firefox/%s/places.sqlite"
+            firefox = (firefoxPath % (name, file))
             shutil.copy2(firefox, dest)
             destSl = dest + opeSysSlash
-            os.rename(destSl + 'places.sqlite', destSl + 'firefox_places.sqlite')
+            os.rename(destSl + 'places.sqlite', destSl + 'frfox_places.sqlite')
             result = True
     except:
         pass
@@ -1013,12 +1028,15 @@ def scanComputerHistoryFirefoxOsx(name, dest):
     current = os.getcwd()
 
     try:
-        os.chdir("/Users/%s/Library/Application Support/Firefox/Profiles" % name)
+        n = name
+        os.chdir("/Users/%s/Library/Application Support/Firefox/Profiles" % n)
         for file in glob.glob("*.default"):
-            firefox = ("/Users/%s/Library/Application Support/Firefox/Profiles/%s/places.sqlite" % (name, file))
+            firefoxPath = ("/Users/%s/Library/Application Support/Firefox/"
+                           "Profiles/%s/places.sqlite")
+            firefox = (firefoxPath % (name, file))
             shutil.copy2(firefox, dest)
             destSl = dest + opeSysSlash
-            os.rename(destSl + 'places.sqlite', destSl + 'firefox_places.sqlite')
+            os.rename(destSl + 'places.sqlite', destSl + 'frfox_places.sqlite')
             result = True
     except:
         pass
@@ -1068,10 +1086,9 @@ def scanComputerHistory(casename, eName):
 
         db = sqlite3.connect(getCaseDatabase(casename))
         cursor = db.cursor()
-        cursor.execute('INSERT INTO `' + eName + '_browser` ('
-                    	'his_chrome, his_ff, his_iexplorer) '
-                    	'VALUES (?,?,?)', (
-                    	his_chrome, his_ff, his_iexplorer))
+        cursor.execute('INSERT INTO `' + eName + '_browser`'
+                       '(his_chrome, his_ff, his_iexplorer)'
+                       'VALUES (?,?,?)', (his_chrome, his_ff, his_iexplorer))
         db.commit()
         result = True
     except:
@@ -1117,7 +1134,7 @@ def scanComputerSoftware(casename, eName):
             for software in uniquelist:
                 try:
                     cursor.execute('INSERT INTO `' + eName + '_software` ('
-                            	'name) VALUES (?)', (software[0],))
+                                   'name) VALUES (?)', (software[0],))
                 except:
                     pass
 
