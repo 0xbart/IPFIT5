@@ -38,12 +38,7 @@ def scanComputerSoftware(casename, eName):
     uniquelist.sort()
 
     for i in uniquelist:
-		db = sqlite3.connect(pythronic.getCaseDatabase(casename))
-		cursor = db.cursor()
-		cursor.execute('INSERT INTO `' + eName + '_software` ('
-			'name) '
-			'VALUES (?,?)', (
-			i))
-		db.commit()
+        print i[0]
+        
 		
 scanComputerSoftware('cloud', 'laptop')
