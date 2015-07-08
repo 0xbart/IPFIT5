@@ -174,7 +174,7 @@ def createEvidenceTables(name, casename, evidenceType):
                 'id INTEGER PRIMARY KEY, drive_name TEXT, '
                 'drive_mountpoint TEXT, drive_filesystem TEXT)',  # 8
                 'CREATE TABLE `' + name + '_files` ('
-                'id INTEGER PRIMARY KEY, name TEXT, parent TEXT, '
+                'id INTEGER PRIMARY KEY, name TEXT, size TEXT, '
                 'shahash TEXT, md5hash TEXT)',  # 9
                 'CREATE TABLE `' + name + '_browser` ('
                 'id INTEGER PRIMARY KEY, his_chrome TEXT, his_ff TEXT, '
@@ -190,7 +190,7 @@ def createEvidenceTables(name, casename, evidenceType):
         elif evidenceType == '2':
             sql = [
                 'CREATE TABLE `' + name + '_files` ('
-                'id INTEGER PRIMARY KEY, name TEXT, parent TEXT,'
+                'id INTEGER PRIMARY KEY, name TEXT, size TEXT,'
                 ' shahash TEXT, md5hash TEXT)',  # 1
                 'CREATE TABLE `' + name + '_virus` ('
                 'id INTEGER PRIMARY KEY, virus_name TEXT, '
