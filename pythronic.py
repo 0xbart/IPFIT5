@@ -674,6 +674,9 @@ def startScan(casename, eName, eType):
         if scanComputerSoftware(casename, eName):
             print ' [X] Software settings completed.'
 
+        if scanComputerDrives(casename, eName):
+            print ' [X] Drives settings completed.'
+
         stop = functions.askInput('halt!', 's')
 
         result = True
@@ -1141,6 +1144,43 @@ def scanComputerSoftware(casename, eName):
 
             db.commit()
             result = True
+    except:
+        pass
+
+    return result
+
+
+def scanComputerDrives(casename, eName):
+    result = False
+
+    try:
+        disklist = []
+        diskinfo = str(psutil.disk_partitions())
+        for match in re.findall('[A-Z]{1}[:]{1}|[/][d][e][v][/][a-z]{3,4}[0-9]'
+                                '{0,2}[a-z]{0,2}[0-9]|[/][\']|[/][V][a-z]'
+                                '{0,12}[/][A-Z]{0,12}|[N][T][F][S]|[n][t]'
+                                '[f][s]|[e][x][t][2-4]|[e]{0,1}[x]{0,1}[F][A]'
+                                '[T]|[h][f][s]|[R][e][F][S]', diskinfo):
+            disklist.append(match)
+
+        countDisks = len(disklist) / 3
+        count = 0
+
+        db = sqlite3.connect(getCaseDatabase(casename))
+        cursor = db.cursor()
+
+        for disk in range(countDisks):
+            cursor.execute('INSERT INTO `' + eName + '_drive`'
+                           '(drive_name, drive_mountpoint, drive_filesystem'
+                           ') VALUES (?,?,?)',
+                           (disklist[count],
+                            disklist[(count + 1)],
+                            disklist[(count + 2)]))
+            count = count + 3
+
+        db.commit()
+
+        result = True
     except:
         pass
 
