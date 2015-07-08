@@ -185,6 +185,8 @@ def createEvidenceTables(name, casename, evidenceType):
                 'id INTEGER PRIMARY KEY, name TEXT)',  # 12
                 'CREATE TABLE `' + name + '_pslist` ('
                 'id INTEGER PRIMARY KEY, name TEXT)',  # 13
+                'CREATE TABLE `' + name + '_files_overview` ('
+                'id INTEGER PRIMARY KEY, html_view TEXT)'  # 3
             ]
 
         elif evidenceType == '2':
@@ -196,7 +198,7 @@ def createEvidenceTables(name, casename, evidenceType):
                 'id INTEGER PRIMARY KEY, virus_name TEXT, '
                 'virus_hash TEXT, virus_output TEXT)',  # 2
                 'CREATE TABLE `' + name + '_files_overview` ('
-                'id INTEGER PRIMARY KEY, html_view TEXT)'
+                'id INTEGER PRIMARY KEY, html_view TEXT)'  # 3
             ]
 
         for i in range(len(sql)):
