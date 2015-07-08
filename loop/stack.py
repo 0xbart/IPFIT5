@@ -35,7 +35,7 @@ def createHTMLFiles(d):
             elif ext in extVideo:
                 html += '<li class="dhtmlgoodies_video.gif"><a href="#">' + file + '</a></li>'
             elif ext in extWord:
-                html += '<li class="dhtmlgoodies_word.png"><a href="#">' + file + '</a></li>'
+                html += '<li class="dhtmlgoodies_word.gif"><a href="#">' + file + '</a></li>'
             elif ext in extExcel:
                 html += '<li class="dhtmlgoodies_excel.gif"><a href="#">' + file + '</a></li>'
             elif ext in extPower:
@@ -49,7 +49,7 @@ def createHTMLFiles(d):
             elif ext in extRar:
                 html += '<li class="dhtmlgoodies_rar.gif"><a href="#">' + file + '</a></li>'
             elif ext in extZip:
-                html += '<li class="dhtmlgoodies_zip.bmp"><a href="#">' + file + '</a></li>'
+                html += '<li class="dhtmlgoodies_zip.gif"><a href="#">' + file + '</a></li>'
             elif ext in extText:
                 html += '<li class="dhtmlgoodies_txt.gif"><a href="#">' + file + '</a></li>'
             else:
