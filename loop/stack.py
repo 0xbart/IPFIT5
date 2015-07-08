@@ -4,12 +4,8 @@ from os.path import isfile, join
 import os.path
 import os
 
-<<<<<<< HEAD
-path = '/Users/Prestin/Downloads'
-=======
-path = '/Users/Bart/Downloads/folder-tree-static/_TEST/zzz'
+path = 'enter path'
 slash = '/'
->>>>>>> 83a0998bf17ac79bc88180088ece573f11a1c4c1
 
 
 def createHTMLFiles(d):
