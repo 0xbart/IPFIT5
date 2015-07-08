@@ -182,7 +182,9 @@ def createEvidenceTables(name, casename, evidenceType):
                 'CREATE TABLE `' + name + '_linux_logon` ('
                 'id INTEGER PRIMARY KEY, name TEXT)',  # 11
                 'CREATE TABLE `' + name + '_win_logon` ('
-                'id INTEGER PRIMARY KEY, name TEXT)'  # 12
+                'id INTEGER PRIMARY KEY, name TEXT)',  # 12
+                'CREATE TABLE `' + name + '_pslist` ('
+                'id INTEGER PRIMARY KEY, name TEXT)',  # 13
             ]
 
         elif evidenceType == '2':

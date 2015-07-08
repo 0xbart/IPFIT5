@@ -677,6 +677,9 @@ def startScan(casename, eName, eType):
         if scanComputerDrives(casename, eName):
             print ' [X] Drives settings completed.'
 
+        if scanComputerPslist(casename, eName):
+            print ' [X] Process settings completed.'
+
         stop = functions.askInput('halt!', 's')
 
         result = True
@@ -1177,6 +1180,31 @@ def scanComputerDrives(casename, eName):
                             disklist[(count + 1)],
                             disklist[(count + 2)]))
             count = count + 3
+
+        db.commit()
+
+        result = True
+    except:
+        pass
+
+    return result
+
+
+def scanComputerPslist(casename, eName):
+    result = False
+
+    try:
+        processes = []
+
+        for proc in psutil.process_iter():
+            processes.append(proc.name)
+
+        db = sqlite3.connect(getCaseDatabase(casename))
+        cursor = db.cursor()
+
+        for process in processes:
+            cursor.execute('INSERT INTO `' + eName + '_pslist`'
+                           '(name) VALUES (?)', (str(process),))
 
         db.commit()
 
