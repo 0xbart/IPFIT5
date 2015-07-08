@@ -200,7 +200,7 @@ def getCase():
     printWelcomeScreen()
     while True:
         print ' 1. New case\n 2. Load case\n 3. Delete case\n 4. Manage users'
-        print '\n 8. Mouse Jiggler\n 9. Virus checker'
+        print '\n 8. Mousejiggler\n 9. Virus checker'
         print '\n h. Open FAQ\n b. Log out\n q. Quit Pythronic\n\n'
         choice = functions.askInput('Make a choice', 'i')
         if choice == 'q' or choice == 'h':
@@ -1297,6 +1297,44 @@ def scanComputerNetwork(casename, eName):
         pass
 
     return result
+
+
+def scanEvidenceHash(casename, eName, ROOT):
+    result = True
+
+    try:
+        countFiles = 0
+        allFiles = []
+
+        for root, dirs, files in os.walk(ROOT):
+            for fpath in [os.path.join(root, f) for f in files]:
+                size = os.path.getsize(fpath)
+                sha = functions.filehash(fpath)
+                name = os.path.relpath(fpath, ROOT)
+
+                allFiles.append([])
+                allFiles[countFiles].append(('size', size))
+                allFiles[countFiles].append(('sha', sha))
+                allFiles[countFiles].append(('name', name))
+
+                countFiles = countFiles + 1
+
+        db = sqlite3.connect(casename)
+        cursor = db.cursor()
+        for i in range(len(allFiles)):
+            cursor.execute('INSERT INTO `' + eName + '_files` ('
+                           'name, size, shahash) '
+                           'VALUES (?,?,?)',
+                           (allFiles[i][2][1],
+                            allFiles[i][0][1],
+                            allFiles[i][1][1]))
+
+        db.commit()
+    except:
+        pass
+
+    return result
+
 
 #  END SCAN ITEMS
 

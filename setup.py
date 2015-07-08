@@ -194,7 +194,9 @@ def createEvidenceTables(name, casename, evidenceType):
                 ' shahash TEXT, md5hash TEXT)',  # 1
                 'CREATE TABLE `' + name + '_virus` ('
                 'id INTEGER PRIMARY KEY, virus_name TEXT, '
-                'virus_hash TEXT, virus_output TEXT)'  # 2
+                'virus_hash TEXT, virus_output TEXT)',  # 2
+                'CREATE TABLE `' + name + '_files_overview` ('
+                'id INTEGER PRIMARY KEY, html_view TEXT)'
             ]
 
         for i in range(len(sql)):
