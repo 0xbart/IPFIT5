@@ -1,5 +1,8 @@
 import sqlite3
 
+iconOk = '<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>'
+iconRemove = '<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>'
+
 db = sqlite3.connect('db/cases/Bart.db')
 cursor = db.cursor()
 
@@ -175,7 +178,12 @@ table = cursor.fetchall() #retrieve the first row
 
 for row in table:
      html += ('<tr>')
-     html += ('<td>' '{0}''</td> ' '<td>' '{1}' '<td>' '{2}' '<td>' '{3}' '<td>' '{4}'.format(row[0], row[1], row[2], row[3], row[4]) + '</td>')
+     html += ('<td>{0}</td><td>{1}<td>{2}<td>{3}<td>{4}'
+              .format(row[0],
+                      iconOk if row[1] == 1 else iconRemove,
+                      iconOk if row[2] == 1 else iconRemove,
+                      iconOk if row[3] == 1 else iconRemove,
+                      iconOk if row[4] == 1 else iconRemove,) + '</td>')
      html += ('</tr>')
 
 
