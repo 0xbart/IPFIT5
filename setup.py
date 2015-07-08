@@ -172,7 +172,7 @@ def createEvidenceTables(name, casename, evidenceType):
                 'virus_hash TEXT, virus_output TEXT)',  # 7
                 'CREATE TABLE `' + name + '_drive` ('
                 'id INTEGER PRIMARY KEY, drive_name TEXT, '
-                'drive_detail TEXT)',  # 8
+                'drive_mountpoint TEXT, drive_filesystem TEXT)',  # 8
                 'CREATE TABLE `' + name + '_files` ('
                 'id INTEGER PRIMARY KEY, name TEXT, parent TEXT, '
                 'shahash TEXT, md5hash TEXT)',  # 9
