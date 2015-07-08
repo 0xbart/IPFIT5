@@ -77,14 +77,14 @@ def startApplication():
 
     datapath = 'data'
     path = os.path.realpath(datapath)
+    printWelcomeScreen()
 
     try:
         if not os.path.exists(datapath):
             os.mkdir(path)
     except:
+        print ' [ERROR]: Data dir does not exist!'
         pass
-
-    printWelcomeScreen()
 
 
 def detectOs():
@@ -178,6 +178,16 @@ def newCase():
         desc = functions.askInput('Enter description case', 's')
         if name.isalpha():
             if functions.createCase(name, desc, user):
+                #  Create own data dir
+                datapath = 'data' + opeSysSlash + name
+                path = os.path.realpath(datapath)
+
+                try:
+                    if not os.path.exists(datapath):
+                        os.mkdir(path)
+                except:
+                    pass
+
                 print ' [INFO]: Case succesfully created.'
                 result = functions.getCaseID(name)
                 break
@@ -442,6 +452,17 @@ def manageCase(cases, action):
                 confirm = functions.askInput(question, 's')
                 if confirm.lower() == 'y' or confirm.lower() == 'p':
                     functions.deleteCase(str(choice), confirm.lower())
+
+                    if confirm.lower() == 'p':
+                        #  Clear case data path
+                        datapath = 'data' + opeSysSlash + casename
+                        path = os.path.realpath(datapath)
+                        try:
+                            if os.path.exists(datapath):
+                                shutil.rmtree(path, ignore_errors=True)
+                        except:
+                            pass
+
                 clearCaseDetails()
                 printWelcomeScreen()
                 break
@@ -679,6 +700,9 @@ def startScan(casename, eName, eType):
 
         if scanComputerPslist(casename, eName):
             print ' [X] Process settings completed.'
+
+        if scanComputerNetwork(casename, eName):
+            print ' [X] Network settings completed.'
 
         stop = functions.askInput('halt!', 's')
 
@@ -1063,7 +1087,7 @@ def scanComputerHistory(casename, eName):
         his_ff = 0
         his_chrome = 0
 
-        datapath = 'data' + opeSysSlash + casename
+        datapath = 'data' + opeSysSlash + casename + opeSysSlash + eName
         path = os.path.realpath(datapath)
 
         try:
@@ -1214,6 +1238,65 @@ def scanComputerPslist(casename, eName):
 
     return result
 
+
+def scanComputerNetwork(casename, eName):
+    result = False
+    opeSysSlash = '/'
+
+    try:
+        datapath = 'data' + opeSysSlash + casename + opeSysSlash + eName
+        path = os.path.realpath(datapath)
+
+        try:
+            if not os.path.exists(datapath):
+                os.mkdir(path)
+        except:
+            pass
+
+        logPath = path + opeSysSlash + 'networking.txt'
+
+        if _platform == 'win32':
+            with open(logPath, 'w') as outfile:
+                subprocess.call('ipconfig.exe /all', stdout=outfile)
+        elif _platform == 'darwin' or _platform == 'linux':
+            with open(logPath, 'w') as outfile:
+                subprocess.call("ifconfig", stdout=outfile)
+
+        unixKeywords = ['inet']
+        windowsKeywords = ['IP', 'DHCP']
+        temp = []
+
+        if _platform == 'win32':
+            with open(logPath, 'r') as file_to_read:
+                for line in file_to_read:
+                    for i, j in enumerate(windowsKeywords):
+                        if j in line:
+                            temp.append(line + ',')
+        elif _platform == 'darwin' or _platform == 'linux':
+            with open(logPath, 'r') as file_to_read:
+                for line in file_to_read:
+                    for i, j in enumerate(unixKeywords):
+                        if j in line:
+                            temp.append(line)
+
+        iplist = []
+        for i, line in enumerate(open(logPath)):
+            for match in re.findall(r'[0-9]+(?:\.[0-9]+){3}', line):
+                iplist.append(match)
+
+        db = sqlite3.connect(getCaseDatabase(casename))
+        cursor = db.cursor()
+        for i in range(len(iplist)):
+            cursor.execute('INSERT INTO `' + eName + '_network`'
+    			   '(ip)'
+    			   'VALUES (?)', (str(iplist[i]),))
+
+        db.commit()
+        result = True
+    except:
+        pass
+
+    return result
 
 #  END SCAN ITEMS
 
