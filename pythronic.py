@@ -30,7 +30,6 @@ import getpass
 import os.path
 import sqlite3
 import platform
-import requests
 import pyperclip
 import functions
 import pyautogui
@@ -84,6 +83,28 @@ def startApplication():
             os.mkdir(path)
     except:
         print ' [ERROR]: Data dir does not exist!'
+        pass
+
+    databasepath = 'db'
+    path = os.path.realpath(databasepath)
+    printWelcomeScreen()
+
+    try:
+        if not os.path.exists(databasepath):
+            os.mkdir(path)
+    except:
+        print ' [ERROR]: DB dir does not exist!'
+        pass
+
+    casespath = 'db' + opeSysSlash + 'cases'
+    path = os.path.realpath(casespath)
+    printWelcomeScreen()
+
+    try:
+        if not os.path.exists(casespath):
+            os.mkdir(path)
+    except:
+        print ' [ERROR]: Cases dir does not exist!'
         pass
 
 
@@ -268,7 +289,6 @@ def getCase():
                         printWelcomeScreen()
                         break
 
-                requests.packages.urllib3.disable_warnings()
                 logPath = (os.getcwd() + opeSysSlash + 'data' + opeSysSlash +
                            'VIRUSSCAN_' + time.strftime('%Y-%m-%d_%H-%M-%S') +
                            '.log')
