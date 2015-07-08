@@ -53,9 +53,10 @@ def createDBUser(db):
             username = functions.askInput('Enter username', 's')
             password = functions.askInput('Enter password', 's')
             if len(username) >= 4 and len(password) >= 4:
+                hashPassword = functions.getHash(password)
                 cursor = db.cursor()
                 cursor.execute('''INSERT INTO users (name, pass, deleted)
-                    VALUES (?,?,?)''', (username, functions.getHash(password), '0'))
+                    VALUES (?,?,?)''', (username, hashPassword, '0'))
                 db.commit()
                 break
             else:
@@ -165,7 +166,7 @@ def createEvidenceTables(name, casename, evidenceType):
                 'connected_ip TEXT)',  # 5
                 'CREATE TABLE `' + name + '_cloud` ('
                 'id INTEGER PRIMARY KEY, dropbox INTEGER, '
-                'onedrive INTEGER, evernote INTEGER, googledrive INTEGER)',  # 6
+                'onedrive INTEGER, evernote INTEGER, googledrive INTEGER)',
                 'CREATE TABLE `' + name + '_virus` ('
                 'id INTEGER PRIMARY KEY, virus_name TEXT, '
                 'virus_hash TEXT, virus_output TEXT)',  # 7
@@ -223,7 +224,7 @@ def deleteEvidence(casename, name, evidenceType):
                 'DROP TABLE `' + name + '_hardware`',  # 6
                 'DROP TABLE `' + name + '_network`',  # 7
                 'DROP TABLE `' + name + '_software`',  # 8
-                'DROP TABLE `' + name + '_unix_logon`',  # 9
+                'DROP TABLE `' + name + '_linux_logon`',  # 9
                 'DROP TABLE `' + name + '_users`',  # 10
                 'DROP TABLE `' + name + '_virus`',  # 11
                 'DROP TABLE `' + name + '_win_logon`'  # 12
