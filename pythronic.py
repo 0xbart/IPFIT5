@@ -222,7 +222,7 @@ def getCase():
     while True:
         print ' 1. New case\n 2. Load case\n 3. Delete case\n 4. Manage users'
         print '\n 8. Mousejiggler\n 9. Virus checker'
-        print '\n h. Open FAQ\n b. Log out\n q. Quit Pythronic\n\n'
+        print '\n h. Open manual\n b. Log out\n q. Quit Pythronic\n\n'
         choice = functions.askInput('Make a choice', 'i')
         if choice == 'q' or choice == 'h':
             globalOperators(choice)
@@ -532,7 +532,7 @@ def menu():
         evidenceIDs = functions.getEvidenceIDs(casename)
         print ' 1. New evidence\n 2. Delete evidence\n 3. Start scan'
         print ' 4. Generate report\n'
-        print ' h. Open FAQ\n b. Exit case\n q. Quit Pythronic\n\n'
+        print ' h. Open manual\n b. Exit case\n q. Quit Pythronic\n\n'
         choice = functions.askInput('Make a choice', 'i')
         if choice == 'q' or choice == 'h':
             globalOperators(choice)
@@ -668,9 +668,9 @@ def newEvidence():
 
 def globalOperators(choice):
     if choice == 'h':
-        print ' [INFO]: FAQ opened in browser.'
-        FAQfile = 'FAQ' + functions.getOsSlash() + 'index.html'
-        webbrowser.open('file://' + os.path.realpath(FAQfile))
+        print ' [INFO]: Manual opened in browser.'
+        manualFile = 'manual' + functions.getOsSlash() + 'index.html'
+        webbrowser.open('file://' + os.path.realpath(manualFile))
     elif choice == 'q':
         sys.exit(0)
 
