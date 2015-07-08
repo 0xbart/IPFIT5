@@ -918,7 +918,7 @@ def scanComputerCloud(casename, eName):
     try:
         googledrive = 0
         dropbox = 0
-        one_drive = 0
+        onedrive = 0
         evernote = 0
 
         if _platform == 'win32':
@@ -997,9 +997,7 @@ def scanComputerCloud(casename, eName):
                        'dropbox, onedrive, evernote) VALUES (?,?,?,?)',
                        (googledrive, dropbox, onedrive, evernote))
         db.commit()
-
         result = True
-
     except:
         pass
 
