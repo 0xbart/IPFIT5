@@ -673,43 +673,111 @@ def startScan(casename, eName, eType):
     result = False
 
     if eType == '1':
+        ROOT = None
+
         #  PC / Laptop scan
         printWelcomeScreen()
-        print ' [INFO]: Scan on evidence ' + eName + ' started.\n'
+        print ' Want to index a (specific) path?\n'
+        confirm = 'Press Y for path input'
+        askFilesPathScan = functions.askInput(confirm, 's')
+        if askFilesPathScan.lower() == 'y':
+            while True:
+                askPath = '\n Enter path'
+                pathInput = functions.askInput(askPath, 's')
+                if os.path.isdir(pathInput):
+                    ROOT = pathInput
+                    break
+                else:
+                    print '\n No valid input, try again!\n'
+
+        print '\n [INFO]: Scan on evidence ' + eName + ' started.\n'
 
         if scanComputerGeneral(casename, eName):
-            print ' [X] General settings completed.'
+            print ' [X]', 'General settings completed.'
+        else:
+            print ' [ ]', 'General settings passed.'
 
         if scanComputerHardware(casename, eName):
-            print ' [X] Hardware settings completed.'
+            print ' [X]', 'Hardware settings completed.'
+        else:
+            print ' [ ]', 'Hardware settings passed.'
 
         if scanComputerStartup(casename, eName):
-            print ' [X] Startup settings completed.'
+            print ' [X]', 'Startup settings completed.'
+        else:
+            print ' [ ]', 'Startup settings passed.'
 
         if scanComputerCloud(casename, eName):
-            print ' [X] Cloud settings completed.'
+            print ' [X]', 'Cloud settings completed.'
+        else:
+            print ' [ ]', 'Cloud settings passed.'
 
         if scanComputerHistory(casename, eName):
-            print ' [X] History settings completed.'
+            print ' [X]', 'History settings completed.'
 
         if scanComputerSoftware(casename, eName):
-            print ' [X] Software settings completed.'
+            print ' [X]', 'Software settings completed.'
+        else:
+            print ' [ ]', 'Software settings passed.'
 
         if scanComputerDrives(casename, eName):
-            print ' [X] Drives settings completed.'
+            print ' [X]', 'Drives settings completed.'
+        else:
+            print ' [ ]', 'Software settings passed.'
 
         if scanComputerPslist(casename, eName):
-            print ' [X] Process settings completed.'
+            print ' [X]', 'Process settings completed.'
+        else:
+            print ' [ ]', 'Software settings passed.'
 
         if scanComputerNetwork(casename, eName):
-            print ' [X] Network settings completed.'
+            print ' [X]', 'Network settings completed.'
+        else:
+            print ' [ ]', 'Software settings passed.'
 
-        stop = functions.askInput('halt!', 's')
+        if ROOT:
+            if scanEvidenceHash(casename, eName, ROOT):
+                print ' [X]', 'Dir file hash completed.'
+            else:
+                print ' [ ]', 'Dir file hash passed.'
 
+            if scanEvidenceFileHierarchie(casename, eName, ROOT):
+                print ' [X]', 'Dir file hierarchie completed.'
+            else:
+                print ' [ ]', 'Dir file hierarchie passed.'
+
+        print '\n [INFO]: Scan successfully ended!'
+        waitUserKeyInput()
         result = True
     elif eType == '2':
+        ROOT = None
+
         #  Device scan
-        print 'b'
+        printWelcomeScreen()
+        print ' Enter the devide path (case sensitive).\n'
+        while True:
+            askPath = '\n Enter path'
+            pathInput = functions.askInput(askPath, 's')
+            if os.path.isdir(pathInput):
+                ROOT = pathInput
+                break
+            else:
+                print '\n No valid input, try again!\n'
+
+        if ROOT:
+            if scanEvidenceHash(casename, eName, ROOT):
+                print ' [X]', 'Dir file hash completed.'
+            else:
+                print ' [ ]', 'Dir file hash passed.'
+
+            if scanEvidenceFileHierarchie(casename, eName, ROOT):
+                print ' [X]', 'Dir file hierarchie completed.'
+            else:
+                print ' [ ]', 'Dir file hierarchie passed.'
+
+        print '\n [INFO]: Scan successfully ended!'
+        waitUserKeyInput()
+        result = True
 
     return result
 
@@ -1288,8 +1356,7 @@ def scanComputerNetwork(casename, eName):
         cursor = db.cursor()
         for i in range(len(iplist)):
             cursor.execute('INSERT INTO `' + eName + '_network`'
-    			   '(ip)'
-    			   'VALUES (?)', (str(iplist[i]),))
+                           '(ip) VALUES (?)', (str(iplist[i]),))
 
         db.commit()
         result = True
@@ -1319,7 +1386,7 @@ def scanEvidenceHash(casename, eName, ROOT):
 
                 countFiles = countFiles + 1
 
-        db = sqlite3.connect(casename)
+        db = sqlite3.connect(getCaseDatabase(casename))
         cursor = db.cursor()
         for i in range(len(allFiles)):
             cursor.execute('INSERT INTO `' + eName + '_files` ('
@@ -1334,6 +1401,123 @@ def scanEvidenceHash(casename, eName, ROOT):
         pass
 
     return result
+
+
+def scanEvidenceFileHierarchie(casename, eName, ROOT):
+    result = False
+
+    try:
+        html = '<ul id="dhtmlgoodies_tree" class="dhtmlgoodies_tree">'
+        html += scanEvidenceFileHierarchieAction(ROOT, True)
+        html += ('<a href="#" onclick="expandAll(\'dhtmlgoodies_tree\');'
+                 'return false">Expand all</a> ')
+        html += ('<a href="#" onclick="collapseAll(\'dhtmlgoodies_tree\');'
+                 'return false">Collapse all</a>')
+
+        db = sqlite3.connect(getCaseDatabase(casename))
+        cursor = db.cursor()
+        cursor.execute('INSERT INTO `' + eName + '_files_overview` ('
+                       'html_view) VALUES (?)', (html,))
+        db.commit()
+
+        result = True
+    except:
+        pass
+
+    return result
+
+
+def scanEvidenceFileHierarchieAction(d, first):
+    try:
+        if first:
+            res = ''
+        else:
+            res = '<ul>'
+
+        lds = os.listdir(d)
+
+        for l in lds:
+            if os.path.isdir(os.path.join(d, l)):
+                dirPath = os.path.join(d, l)
+                res += '<li><a href="#">' + l + '</a>'
+                res += scanEvidenceFileHierarchieAction(dirPath, False)
+                if not first:
+                    res += scanEvidenceFileHierarchieHTML(d)
+                res += '</li>'
+
+        if first:
+            res += scanEvidenceFileHierarchieHTML(d)
+        res += '</ul>'
+        html = res.replace('<ul></ul>', '')
+
+        return html
+    except:
+        pass
+
+
+def scanEvidenceFileHierarchieHTML(d):
+    html = ''
+
+    extImg = ['.png', '.jpg', '.jpeg', '.tiff', '.bmp']
+    extVideo = ['.avi', '.mp4', '.mkv']
+    extWord = ['.doc', '.docx', '.dot', 'dotx']
+    extExcel = ['.xls', '.xlsx', '.xlt', '.xltx']
+    extPower = ['.ppt', '.pptx', '.pot', '.pps', '.potx', 'ppsx']
+    extExe = ['.exe']
+    extMail = ['.pst']
+    extPdf = ['.pdf']
+    extRar = ['.rar']
+    extZip = ['.zip']
+    extText = ['.txt', '.log']
+
+    try:
+        path = os.path.isfile(os.path.join(d, f))
+        files = [f for f in os.listdir(d) if path]
+
+        for file in files:
+            ext = os.path.splitext(file)[1]
+            ext = ext.lower()
+
+            if ext in extImg:
+                html += ('<li class="dhtmlgoodies_photo.gif">'
+                         '<a href="#">' + file + '</a></li>')
+            elif ext in extVideo:
+                html += ('<li class="dhtmlgoodies_video.gif">'
+                         '<a href="#">' + file + '</a></li>')
+            elif ext in extWord:
+                html += ('<li class="dhtmlgoodies_word.gif">'
+                         '<a href="#">' + file + '</a></li>')
+            elif ext in extExcel:
+                html += ('<li class="dhtmlgoodies_excel.gif">'
+                         '<a href="#">' + file + '</a></li>')
+            elif ext in extPower:
+                html += ('<li class="dhtmlgoodies_power.gif">'
+                         '<a href="#">' + file + '</a></li>')
+            elif ext in extExe:
+                html += ('<li class="dhtmlgoodies_exe.gif">'
+                         '<a href="#">' + file + '</a></li>')
+            elif ext in extMail:
+                html += ('<li class="dhtmlgoodies_mail.gif">'
+                         '<a href="#">' + file + '</a></li>')
+            elif ext in extPdf:
+                html += ('<li class="dhtmlgoodies_pdf.gif">'
+                         '<a href="#">' + file + '</a></li>')
+            elif ext in extRar:
+                html += ('<li class="dhtmlgoodies_rar.gif">'
+                         '<a href="#">' + file + '</a></li>')
+            elif ext in extZip:
+                html += ('<li class="dhtmlgoodies_zip.gif">'
+                         '<a href="#">' + file + '</a></li>')
+            elif ext in extText:
+                html += ('<li class="dhtmlgoodies_txt.gif">'
+                         '<a href="#">' + file + '</a></li>')
+            else:
+                html += ('<li class="dhtmlgoodies_sheet.gif">'
+                         '<a href="#">' + file + '</a></li>')
+    except:
+        pass
+
+    return html
 
 
 #  END SCAN ITEMS
