@@ -668,7 +668,8 @@ def newEvidence():
 
 def globalOperators(choice):
     if choice == 'h':
-        print ' [INFO]: Manual opened in browser.'
+        printWelcomeScreen()
+        print ' [INFO]: Manual opened in browser.\n'
         manualFile = 'manual' + functions.getOsSlash() + 'index.html'
         webbrowser.open('file://' + os.path.realpath(manualFile))
     elif choice == 'q':
