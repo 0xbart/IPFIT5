@@ -505,6 +505,26 @@ def appendLog(level, message):
     return result
 
 
+def appendCaseLog(casename, level, message):
+    result = False
+
+    try:
+        database = ('db' + getOsSlash() + 'cases' +
+                    getOsSlash() + casename + '.db')
+        db = sqlite3.connect(database)
+        cursor = db.cursor()
+        cursor.execute('''INSERT INTO logs (ddate, datetime, level, description)
+                          VALUES (?,?,?,?)''', (
+                          time.strftime("%Y-%m-%d"),
+                          time.strftime("%Y-%m-%d %H:%M:%S"), level, message))
+        db.commit()
+        result = True
+    except:
+        print '\n [ERROR]: Log entry cannot be writed into the database.'
+
+    return result
+
+
 def signal_handler(signal, frame):
     sys.exit(0)
 

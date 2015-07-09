@@ -94,6 +94,8 @@ def createCaseDBTables(db):
         cursor = db.cursor()
         sql = ('''CREATE TABLE general (id INTEGER PRIMARY KEY,
                   name TEXT, description TEXT, created_at TIMESTAMP);
+                  CREATE TABLE logs (id INTEGER PRIMARY KEY, ddate DATE,
+                  datetime TIMESTAMP, level TEXT, description TEXT);
                   CREATE TABLE evidences (id INTEGER PRIMARY KEY, name TEXT,
                   description TEXT, type INTEGER, created_at TIMESTAMP,
                   deleted INTEGER);''')

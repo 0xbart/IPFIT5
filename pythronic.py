@@ -62,14 +62,16 @@ def main():
     detectOs()
     startApplication()
     login()
-    getCase()
-    menu()
+    while True:
+        getCase()
+        menu()
+        clearCaseDetails()
 
 
 def startApplication():
     if not os.path.isfile('db' + functions.getOsSlash() + 'pythronic.db'):
         printWelcomeScreen()
-        print (' [INFO]: Database doesn\'t exist; executing setup.\n')
+        print ' [INFO]: Database doesn\'t exist; executing setup.\n'
         setup.createDatabase()
 
     functions.appendLog('i', 'Application Pythronic started.')
@@ -364,8 +366,8 @@ def manageUsers():
             if choice == 1:
                 if manageUser('new'):
                     printWelcomeScreen()
-                    print (' [INFO]: User succesfully added to the '
-                           'database.\n')
+                    print(' [INFO]: User succesfully added to the '
+                          'database.\n')
             if choice == 2:
                 if manageUser('delete'):
                     printWelcomeScreen()
@@ -527,6 +529,8 @@ def clearUserDetails():
 
 def menu():
     printWelcomeScreen()
+    message = 'Case ' + casename + ' has been opened by ' + user
+    functions.appendCaseLog(casename, 'i', message)
     while True:
         evidences = functions.getEvidences(casename)
         evidenceIDs = functions.getEvidenceIDs(casename)
@@ -537,17 +541,22 @@ def menu():
         if choice == 'q' or choice == 'h':
             globalOperators(choice)
         elif choice == 'b':
-            clearCaseDetails()
-            getCase()
-            menu()
+            break
+            # clearCaseDetails()
+            # getCase()
+            # menu()
         elif choice == 1:
             new = newEvidence()
             if new:
                 printWelcomeScreen()
                 print ' [INFO]: Evidence ' + new + ' created succesfully!\n'
+                message = 'Evidence ' + new + ' added to the database.'
+                functions.appendCaseLog(casename, 'i', message)
             else:
                 printWelcomeScreen()
                 print ' [ERROR]: while creating new evidence.\n'
+                message = 'Evidence ' + new + ' cannot be created.'
+                functions.appendCaseLog(casename, 'w', message)
         elif choice == 2:
             if len(evidences) > 0:
                 printWelcomeScreen()
@@ -573,13 +582,19 @@ def menu():
                             oper = str(confirm.lower())
                             if functions.deleteEvidence(name, ID, oper):
                                 printWelcomeScreen()
-                                print (' [INFO]: Evidence ' + evidence +
-                                       ' deleted succesfully!\n')
+                                print(' [INFO]: Evidence ' + evidence +
+                                      ' deleted succesfully!\n')
+                                message = ('Evidence ' + evidence +
+                                           'deleted by ' + user + '.')
+                                functions.appendCaseLog(casename, 'i', message)
                                 break
                             else:
                                 printWelcomeScreen()
-                                print (' [ERROR]: Evidence ' + evidence +
-                                       ' cannot be deleted!\n')
+                                print(' [ERROR]: Evidence ' + evidence +
+                                      ' cannot be deleted!\n')
+                                message = ('Evidence ' + evidence +
+                                           'cannot be deleted.')
+                                functions.appendCaseLog(casename, 'w', message)
                                 break
                         else:
                             printWelcomeScreen()
@@ -616,26 +631,40 @@ def menu():
                                    'Press Y to proceed')
                         choiceScan = functions.askInput(confirm, 's')
                         if choiceScan.lower() == 'y':
+                            message = ('Scan on evidence ' + eName +
+                                       'started by ' + user + '.')
+                            functions.appendCaseLog(casename, 'i', message)
                             eType = functions.getEvidenceType(casename, eID)
                             if startScan(casename, eName, eType):
                                 printWelcomeScreen()
-                                print (' [INFO]: Scan on ' + eName +
-                                       ' succesfully completed!\n')
+                                print(' [INFO]: Scan on ' + eName +
+                                      ' succesfully completed!\n')
+                                message = ('Scan on evidence ' + eName +
+                                           'successfully ended.')
+                                functions.appendCaseLog(casename, 'i', message)
                                 break
                             else:
                                 printWelcomeScreen()
-                                print (' [INFO]: Scan on ' + eName +
-                                       ' failed!\n')
+                                print(' [INFO]: Scan on ' + eName +
+                                      ' failed!\n')
+                                message = ('Scan on evidence ' + eName +
+                                           'failed!')
+                                functions.appendCaseLog(casename, 'w', message)
                                 break
                         else:
                             printWelcomeScreen()
                             print ' [INFO]: Scan aborted.\n'
+                            message = ('Scan on evidence ' + eName +
+                                       'aborted.')
+                            functions.appendCaseLog(casename, 'i', message)
                             break
             else:
                 printWelcomeScreen()
                 print ' [ERROR]: No evidences found, add first an evidence.\n'
         elif choice == 4:
             print 'rapport bouwen'
+            message = ('Building rapport of case ' + casename + '.')
+            functions.appendCaseLog(casename, 'i', message)
         else:
             print '\n Wrong input, try again!\n'
 
@@ -661,8 +690,8 @@ def newEvidence():
                 print ' [ERROR]: EvidenceType is not a valid choice.\n'
             else:
                 printWelcomeScreen()
-                print (' [ERROR]: Name must be an alphabetic '
-                       'string, no spaces.\n')
+                print(' [ERROR]: Name must be an alphabetic '
+                      'string, no spaces.\n')
     return result
 
 
@@ -1491,7 +1520,7 @@ def scanEvidenceFileHierarchieHTML(d):
     extText = ['.txt', '.log']
 
     try:
-        files = [f for f in os.listdir(d) if os.path.isfile(os.path.join(d,f))]
+        files = [f for f in os.listdir(d) if os.path.isfile(os.path.join(d, f))]
 
         for file in files:
             ext = os.path.splitext(file)[1]
