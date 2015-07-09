@@ -1614,8 +1614,6 @@ def scanEvidenceFileHierarchieHTML(d):
 
 
 def makeRapport(casename, eName, evidenceType):
-    opeSysSlash = '/'
-
     casepath = (os.getcwd() + opeSysSlash + 'data' + opeSysSlash +
                 casename + opeSysSlash)
     name = 'report_' + time.strftime('%Y-%m-%d_%H-%M-%S') + '.html'
