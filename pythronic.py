@@ -2007,38 +2007,40 @@ def makeRapport(casename, eName, evidenceType):
         #  END IF HARDWARE
         #  START IF SOFTWARE
 
-        if fetchSoftware and evidenceType == '1':
-            html += '''
-                <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h4 class="panel-title">
-                        <a class="accordion-toggle collapsed"
-                        data-toggle="collapse" data-parent="#accordion"
-                        href="#collapseFour">Software lijst</a>
-                    </h4>
-                </div>
-                <div id="collapseFour" class="panel-collapse collapse">
-                <div class="panel-body">
-                <table class="table table-hover">
-                <tr>
-                    <th>ID</th>
-                    <th>Naam</th>
-                </tr>
-            '''
+        try:
+            if fetchSoftware and evidenceType == '1':
+                html += '''
+                    <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a class="accordion-toggle collapsed"
+                            data-toggle="collapse" data-parent="#accordion"
+                            href="#collapseFour">Software lijst</a>
+                        </h4>
+                    </div>
+                    <div id="collapseFour" class="panel-collapse collapse">
+                    <div class="panel-body">
+                    <table class="table table-hover">
+                    <tr>
+                        <th>ID</th>
+                        <th>Naam</th>
+                    </tr>
+                '''
 
-            for row in fetchSoftware:
-                html += ('<tr>')
-                html += ('<td>{0}</td><td>{1}</td>'
-                         .format(row[0], row[1]))
-                html += ('</tr>')
+                for row in fetchSoftware:
+                    html += ('<tr>')
+                    html += ('<td>{0}</td><td>{1}</td>'
+                             .format(row[0], row[1]))
+                    html += ('</tr>')
 
-            html += '''
-                </table>
-                </div>
-                </div>
-                </div>
-            '''
-
+                html += '''
+                    </table>
+                    </div>
+                    </div>
+                    </div>
+                '''
+        except:
+            pass
         #  END IF SOFTWARE
         #  START IF CLOUD
 
