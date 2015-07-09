@@ -1689,7 +1689,7 @@ def makeRapport(casename, eName, evidenceType):
         fetchNetwork = cursor.fetchall()
 
         cursor.execute('''SELECT id, name
-                          FROM PC_pslist''')
+                          FROM ''' + eName + '''_pslist''')
         fetchPslist = cursor.fetchall()
 
         cursor.execute('''SELECT id, ddate, datetime, level, description
