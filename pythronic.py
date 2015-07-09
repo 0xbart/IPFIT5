@@ -35,10 +35,11 @@ import functions
 import pyautogui
 import subprocess
 import webbrowser
+import pkg_resources
 
 try:
-    from _winreg import *
     import wmi
+    from _winreg import *
 except:
     pass
 
@@ -69,16 +70,8 @@ def main():
 
 
 def startApplication():
-    if not os.path.isfile('db' + functions.getOsSlash() + 'pythronic.db'):
-        printWelcomeScreen()
-        print ' [INFO]: Database doesn\'t exist; executing setup.\n'
-        setup.createDatabase()
-
-    functions.appendLog('i', 'Application Pythronic started.')
-
     datapath = 'data'
     path = os.path.realpath(datapath)
-    printWelcomeScreen()
 
     try:
         if not os.path.exists(datapath):
@@ -87,9 +80,13 @@ def startApplication():
         print ' [ERROR]: Data dir does not exist!'
         pass
 
+    if not os.path.isfile('db' + functions.getOsSlash() + 'pythronic.db'):
+        printWelcomeScreen()
+        print ' [INFO]: Database doesn\'t exist; executing setup.\n'
+        setup.createDatabase()
+
     databasepath = 'db'
     path = os.path.realpath(databasepath)
-    printWelcomeScreen()
 
     try:
         if not os.path.exists(databasepath):
@@ -100,7 +97,6 @@ def startApplication():
 
     casespath = 'db' + opeSysSlash + 'cases'
     path = os.path.realpath(casespath)
-    printWelcomeScreen()
 
     try:
         if not os.path.exists(casespath):
@@ -108,6 +104,9 @@ def startApplication():
     except:
         print ' [ERROR]: Cases dir does not exist!'
         pass
+
+    functions.appendLog('i', 'Application Pythronic started.')
+    printWelcomeScreen()
 
 
 def detectOs():
@@ -939,6 +938,8 @@ def scanComputerHardware(casename, eName):
 
             result = True
         elif opeSys == 'win32' or opeSys == 'windows':
+            import wmi
+
             mem = virtual_memory()
             c = wmi.WMI()
             for i in c.Win32_Processor():
@@ -1700,7 +1701,7 @@ def makeRapport(casename, eName, evidenceType):
 
         #  START ALL FILES HTML
 
-        if fetchAllFiles:
+        if len(fetchFiles) == 10:
             try:
                 html2 = '''
                     <!DOCTYPE html>
@@ -2028,7 +2029,7 @@ def makeRapport(casename, eName, evidenceType):
             for row in fetchSoftware:
                 html += ('<tr>')
                 html += ('<td>{0}</td><td>{1}</td>'
-                         .format(row[0], row[1].encode('utf-8')))
+                         .format(row[0], row[1]))
                 html += ('</tr>')
 
             html += '''
