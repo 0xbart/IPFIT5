@@ -180,8 +180,10 @@ def login():
         if functions.checkLogin(username, password):
             user = username
             userID = functions.getUserID(username)
+            functions.appendLog('i', 'User ' + user + ' logged in.')
             break
         else:
+            functions.appendLog('w', 'Login failed with username ' + username)
             print '\n Login failed, try again. \n'
 
     return user
@@ -211,7 +213,7 @@ def newCase():
                 except:
                     pass
 
-                print ' [INFO]: Case succesfully created.'
+                print ' [INFO]: Case successfully created.'
                 result = functions.getCaseID(name)
                 break
         else:
@@ -231,7 +233,8 @@ def getCase():
         elif choice == 'b':
             clearUserDetails()
             clearScreen()
-            print ' \n Succesfully logged out.\n\n'
+            print ' \n successfully logged out.\n\n'
+            functions.appendLog('i', 'User ' + user + 'logged out.')
             login()
             printWelcomeScreen()
         elif choice == 1:
@@ -253,13 +256,16 @@ def getCase():
                     case = manageCase(cases, 'delete')
                     if case:
                         print ' [INFO]: Case (nr ' + case + ') deleted!'
+                        functions.appendLog('i', 'Case (ID' + case + ') '
+                                            'deleted.')
             else:
                 print '\n No cases found in the database.\n'
         elif choice == 4:
             manageUsers()
         elif choice == 8:
             printWelcomeScreen()
-            print ' [INFO]: Mouse jiggler starting. Press CTRL-C to abort.\n'
+            print ' [INFO]: Mousejiggler starting. Press CTRL-C to abort.\n'
+            functions.appendLog('i', 'Mousejiggler successfully started.')
             try:
                 count = 0
                 pxl = 10
@@ -274,9 +280,11 @@ def getCase():
                 pass
             printWelcomeScreen()
             print ' [INFO]: Stopping mouse jiggler.\n'
+            functions.appendLog('i', 'Mousejiggler successfully stopped.')
         elif choice == 9:
             try:
                 printWelcomeScreen()
+                functions.appendLog('i', 'Virusscan check started.')
                 scanPath = None
 
                 while True:
@@ -314,7 +322,7 @@ def getCase():
                         fullList.append(name)
                     hashtag += '#'
 
-                print '\n\n [INFO]: File hash succesfully, scan started.\n'
+                print '\n\n [INFO]: File hash successfully, scan started.\n'
 
                 for i, item in enumerate(hashList):
                     stepCount = stepCount + 1
@@ -341,13 +349,15 @@ def getCase():
                 else:
                     print '\n You are free of any known malicious software'
 
-                print '\n [INFO]: Scan completed succesfully!'
+                print '\n [INFO]: Scan completed successfully!'
                 print '\n Logfile path: ' + logPath
+                functions.appendLog('i', 'Virusscan check stopped.')
                 waitUserKeyInput()
                 printWelcomeScreen()
             except:
                 printWelcomeScreen()
                 print ' [INFO]: Scan malware checker aborted!\n'
+                functions.appendLog('w', 'Virusscan check aborted.')
         else:
             print '\n Wrong input, try again!\n'
 
@@ -366,12 +376,12 @@ def manageUsers():
             if choice == 1:
                 if manageUser('new'):
                     printWelcomeScreen()
-                    print(' [INFO]: User succesfully added to the '
+                    print(' [INFO]: User successfully added to the '
                           'database.\n')
             if choice == 2:
                 if manageUser('delete'):
                     printWelcomeScreen()
-                    print ' User succesfully deleted.\n'
+                    print ' User successfully deleted.\n'
         else:
             print '\n Wrong input, try again!\n'
 
@@ -395,6 +405,7 @@ def manageUser(action):
             if len(username) >= 4:
                 if functions.createUser(username, password):
                     result = True
+                    functions.appendLog('i', 'User ' + username + ' created.')
                     break
                 else:
                     print '\n [ERROR]: User cannot be created!\n'
@@ -425,6 +436,8 @@ def manageUser(action):
                         confirm = functions.askInput(question, 's')
                         if confirm.lower() == 'y' or confirm.lower() == 'p':
                             functions.deleteUser(str(choice), confirm.lower())
+                            functions.appendLog('i', 'User ' + username +
+                                                ' deleted.')
                             result = True
                         printWelcomeScreen()
                         break
@@ -472,8 +485,12 @@ def manageCase(cases, action):
                 question = '[WARNING]: Deleting `' + casename + '`? '
                 question += 'Y = yes, P = permanently, other = abort'
                 confirm = functions.askInput(question, 's')
+                message = None
                 if confirm.lower() == 'y' or confirm.lower() == 'p':
-                    functions.deleteCase(str(choice), confirm.lower())
+                    if functions.deleteCase(str(choice), confirm.lower()):
+                        message = 'Case ' + casename + ' successfully deleted.'
+                        functions.appendLog('i', 'Case ' + casename +
+                                            ' deleted.')
 
                     if confirm.lower() == 'p':
                         #  Clear case data path
@@ -487,6 +504,8 @@ def manageCase(cases, action):
 
                 clearCaseDetails()
                 printWelcomeScreen()
+                if message:
+                    print ' [INFO]:' + message + '\n'
                 break
         else:
             print '\n Wrong input, try again!\n'
@@ -549,7 +568,7 @@ def menu():
             new = newEvidence()
             if new:
                 printWelcomeScreen()
-                print ' [INFO]: Evidence ' + new + ' created succesfully!\n'
+                print ' [INFO]: Evidence ' + new + ' created successfully!\n'
                 message = 'Evidence ' + new + ' added to the database.'
                 functions.appendCaseLog(casename, 'i', message)
             else:
@@ -583,7 +602,7 @@ def menu():
                             if functions.deleteEvidence(name, ID, oper):
                                 printWelcomeScreen()
                                 print(' [INFO]: Evidence ' + evidence +
-                                      ' deleted succesfully!\n')
+                                      ' deleted successfully!\n')
                                 message = ('Evidence ' + evidence +
                                            'deleted by ' + user + '.')
                                 functions.appendCaseLog(casename, 'i', message)
@@ -632,15 +651,15 @@ def menu():
                         choiceScan = functions.askInput(confirm, 's')
                         if choiceScan.lower() == 'y':
                             message = ('Scan on evidence ' + eName +
-                                       'started by ' + user + '.')
+                                       ' started by ' + user + '.')
                             functions.appendCaseLog(casename, 'i', message)
                             eType = functions.getEvidenceType(casename, eID)
                             if startScan(casename, eName, eType):
                                 printWelcomeScreen()
                                 print(' [INFO]: Scan on ' + eName +
-                                      ' succesfully completed!\n')
+                                      ' successfully completed!\n')
                                 message = ('Scan on evidence ' + eName +
-                                           'successfully ended.')
+                                           ' successfully ended.')
                                 functions.appendCaseLog(casename, 'i', message)
                                 break
                             else:
@@ -662,9 +681,34 @@ def menu():
                 printWelcomeScreen()
                 print ' [ERROR]: No evidences found, add first an evidence.\n'
         elif choice == 4:
-            print 'rapport bouwen'
-            message = ('Building rapport of case ' + casename + '.')
-            functions.appendCaseLog(casename, 'i', message)
+            printWelcomeScreen()
+            print ' Start building report, follow instructions:'
+            while True:
+                print ' Select evidence to start building.\n'
+                for evidence in evidences:
+                    print(' {0}: {1}'.format(evidence[0], evidence[1]))
+                print '\n b. Back to menu.'
+                choice = functions.askInput('\n Make a choice', 'i')
+                if choice == 'q' or choice == 'h':
+                    globalOperators(choice)
+                elif choice == 'b':
+                    printWelcomeScreen()
+                    break
+                elif choice in evidenceIDs:
+                    message = ('Building rapport of case ' + casename + '.')
+                    functions.appendCaseLog(casename, 'i', message)
+                    eID = str(choice)
+                    eName = functions.getEvidence(casename, str(choice))
+                    eType = functions.getEvidenceType(casename, eID)
+
+                    if makeRapport(casename, eName, eType):
+                        print ' [INFO] Report created successfully!'
+                    else:
+                        print ' [ERROR] Creating report failed!'
+
+                    waitUserKeyInput()
+                    printWelcomeScreen()
+                    break
         else:
             print '\n Wrong input, try again!\n'
 
@@ -702,6 +746,7 @@ def globalOperators(choice):
         manualFile = 'manual' + functions.getOsSlash() + 'index.html'
         webbrowser.open('file://' + os.path.realpath(manualFile))
     elif choice == 'q':
+        functions.appendLog('i', 'Application Pythronic stopped.')
         sys.exit(0)
 
 
@@ -1566,6 +1611,943 @@ def scanEvidenceFileHierarchieHTML(d):
         pass
 
     return html
+
+
+def makeRapport(casename, eName, evidenceType):
+    opeSysSlash = '/'
+
+    casepath = (os.getcwd() + opeSysSlash + 'data' + opeSysSlash +
+                casename + opeSysSlash)
+    name = 'report_' + time.strftime('%Y-%m-%d_%H-%M-%S') + '.html'
+    namef = 'report_files_' + time.strftime('%Y-%m-%d_%H-%M-%S') + '.html'
+
+    result = False
+
+    try:
+        iconOk = ('<span class="glyphicon glyphicon-ok" aria-hidden="true">'
+                  '</span>')
+        iconRemove = ('<span class="glyphicon glyphicon-remove"'
+                      'aria-hidden="true"></span>')
+
+        db = sqlite3.connect(getCaseDatabase(casename))
+        db2 = sqlite3.connect('db/pythronic.db')
+        cursor = db.cursor()
+        cursor2 = db2.cursor()
+
+        cursor.execute('''SELECT id, name, description, type, created_at, deleted
+                          FROM evidences''')
+        fetchEvidences = cursor.fetchall()
+
+        cursor.execute('''SELECT id, name, description, created_at
+                          FROM general''')
+        fetchGeneral = cursor.fetchall()
+
+        cursor.execute('''SELECT id, processor, usb_devices, system_arch,
+                          proc_name, proc_family, used_memory, free_memory,
+                          total_memory FROM ''' + eName + '''_hardware''')
+        fetchHardware = cursor.fetchall()
+
+        cursor.execute('''SELECT id, name
+                          FROM ''' + eName + '''_software''')
+        fetchSoftware = cursor.fetchall()
+
+        cursor.execute('''SELECT id, dropbox, onedrive, evernote, googledrive
+                          FROM ''' + eName + '''_cloud''')
+        fetchCloud = cursor.fetchall()
+
+        cursor.execute('''SELECT id, his_chrome, his_ff, his_iexplorer
+                          FROM ''' + eName + '''_browser''')
+        fetchBrowser = cursor.fetchall()
+
+        cursor.execute('''SELECT id, drive_name, drive_mountpoint, drive_filesystem
+                           FROM ''' + eName + '''_drive''')
+        fetchDrive = cursor.fetchall()
+
+        cursor.execute('''SELECT id, name, size, shahash, md5hash
+                          FROM ''' + eName + '''_files LIMIT 0, 10''')
+        fetchFiles = cursor.fetchall()
+
+        if len(fetchFiles) == 10:
+            cursor.execute('''SELECT id, name, size, shahash, md5hash
+                              FROM ''' + eName + '''_files''')
+            fetchAllFiles = cursor.fetchall()
+
+        cursor.execute('''SELECT html_view
+                          FROM ''' + eName + '''_files_overview''')
+        fetchFilesOverview = cursor.fetchall()
+
+        cursor.execute('''SELECT id, name
+                          FROM ''' + eName + '''_linux_logon''')
+        fetchLinuxLogin = cursor.fetchall()
+
+        cursor.execute('''SELECT id, name
+                          FROM ''' + eName + '''_win_logon''')
+        fetchWindowsLogon = cursor.fetchall()
+
+        cursor.execute('''SELECT id, ip, mac, connected_ip
+                          FROM ''' + eName + '''_network''')
+        fetchNetwork = cursor.fetchall()
+
+        cursor.execute('''SELECT id, name
+                          FROM PC_pslist''')
+        fetchPslist = cursor.fetchall()
+
+        cursor.execute('''SELECT id, ddate, datetime, level, description
+                           FROM logs''')
+        fetchLogCase = cursor.fetchall()
+
+        cursor2.execute('''SELECT id, ddate, datetime, level, description
+                           FROM logs''')
+        fetchLogPythronic = cursor2.fetchall()
+
+        #  START ALL FILES HTML
+
+        if fetchAllFiles:
+            try:
+                html2 = '''
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <meta charset="utf-8" />
+                        <title>Pythronic - Rapport - Alle bestanden</title>
+                        <meta name="viewport" content="width=device-width,
+                        initial-scale=1.0" />
+                        <link rel="stylesheet" type="text/css"
+                        href="../../bootstrap/css/bootstrap.min.css" />
+                        <link rel="stylesheet" type="text/css"
+                        href="../../bootstrap/css/font-awesome.min.css" />
+                        <script type="text/javascript"
+                        src="../../bootstrap/js/jquery-1.10.2.min.js"></script>
+                        <script type="text/javascript"
+                        src="../../bootstrap/js/bootstrap.min.js"></script>
+                    </head>
+                    <body>
+                    <div class="container">
+                    <div class="page-header">
+                        <h1>Pythronic <small>Alle bestanden</small></h1>
+                    </div>
+                    <div class="container">
+                    <div class="alert alert-info alert-dismissible"
+                    role="alert">
+                    <button type="button" class="close" data-dismiss="alert">
+                    <span aria-hidden="true">&times;</span>
+                    <span class="sr-only">Close</span></button>
+                    Dit is het automatisch gerenegeerde rapport, gemaakt op
+                    ''' + time.strftime('%Y-%m-%d %H-%M-%S') + '''.
+                    Bekijk de resultaten in de uitklapbare lijsten.
+                    Dit rapport maakt deel uit van een ander rapport.
+                    </div>
+                    <div class="panel-group" id="accordion">
+                    <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a class="accordion-toggle"
+                            data-toggle="collapse" data-parent="#accordion"
+                            href="#collapseOne"> Alle bestanden</a>
+                        </h4>
+                    </div>
+                    <div id="collapseOne" class="panel-collapse">
+                    <div class="panel-body">
+                        <table class="table table-hover">
+                        <tr>
+                            <th>ID</th>
+                            <th>Naam</th>
+                            <th>Size</th>
+                            <th>SHA</th>
+                            <th>MD5</th>
+                        </tr>
+                '''
+
+                for row in fetchAllFiles:
+                    html2 += ('<tr>')
+                    html2 += ('<td>{0}</td><td>{1}</td><td>{2}</td>'
+                              '<td>{3}</td><td>{4}</td>'
+                              .format(row[0],
+                                      row[1],
+                                      row[2],
+                                      row[3],
+                                      iconRemove if str(row[4]) == 'None'
+                                      else row[4]))
+                    html2 += ('</tr>')
+
+                html2 += '''
+                    </table>
+                    </div>
+                    </div>
+                    </div>
+                    </div>
+                    <style>
+                    .faqHeader {
+                        font-size: 27px;
+                        margin: 20px;
+                    }
+
+                    .panel-heading [data-toggle="collapse"]:after {
+                        font-family: 'Glyphicons Halflings';
+                        content: "\e072"; /* "play" icon */
+                        float: right;
+                        color: #F58723;
+                        font-size: 18px;
+                        line-height: 22px;
+                        -webkit-transform: rotate(-90deg);
+                        -moz-transform: rotate(-90deg);
+                        -ms-transform: rotate(-90deg);
+                        -o-transform: rotate(-90deg);
+                        transform: rotate(-90deg);
+                    }
+
+                    .panel-heading [data-toggle="collapse"].collapsed:after {
+                        -webkit-transform: rotate(90deg);
+                        -moz-transform: rotate(90deg);
+                        -ms-transform: rotate(90deg);
+                        -o-transform: rotate(90deg);
+                        transform: rotate(90deg);
+                        color: #454444;
+                    }
+                    </style>
+                    </div>
+                    </body>
+                    </html>
+                '''
+
+                file = open(casepath + namef, 'w')
+                file.write(html2)
+                file.close()
+            except:
+                pass
+
+        #  END ALL FILES HTML
+
+        #  START START HTML
+
+        html = '''
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="utf-8" />
+                <title>Pythronic - Rapport</title>
+                <meta name="viewport" content="width=device-width,
+                initial-scale=1.0" />
+                <link rel="stylesheet" type="text/css"
+                href="../../bootstrap/css/bootstrap.min.css" />
+                <link rel="stylesheet" type="text/css"
+                href="../../bootstrap/css/font-awesome.min.css" />
+                <script type="text/javascript"
+                src="../../bootstrap/js/jquery-1.10.2.min.js"></script>
+                <script type="text/javascript"
+                src="../../bootstrap/js/bootstrap.min.js"></script>
+
+                <link rel="stylesheet"
+                href="../../bootstrap/css/folder-tree-static.css" type="text/css">
+                <link rel="stylesheet" href="../../bootstrap/css/context-menu.css"
+                type="text/css">
+                <script type="text/javascript" src="../../bootstrap/js/ajax.js">
+                </script>
+                <script type="text/javascript"
+                src="../../bootstrap/js/folder-tree-static.js"></script>
+                <script type="text/javascript"
+                src="../../bootstrap/js/context-menu.js"></script>
+            </head>
+        '''
+
+        #  END START HMLT
+
+        #  START HTML BODY
+        html += '''
+            <body>
+                <div class="container">
+                <div class="page-header">
+                    <h1>Pythronic <small>Report</small></h1>
+                </div>
+                <div class="container">
+                <div class="alert alert-info alert-dismissible" role="alert">
+                    <button type="button" class="close" data-dismiss="alert">
+                    <span aria-hidden="true">&times;</span>
+                    <span class="sr-only">Close</span></button>
+                    Dit is het automatisch gerenegeerde rapport, gemaakt op
+                    ''' + time.strftime('%Y-%m-%d %H-%M-%S') + '''.
+                    Bekijk de resultaten in de uitklapbare lijsten.
+                </div>
+                <div class="panel-group" id="accordion">
+                <div class="faqHeader">Case [''' + casename + ''']</div>
+                <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a class="accordion-toggle collapsed"
+                        data-toggle="collapse" data-parent="#accordion"
+                        href="#collapseOne"> Bewijsmateriaal</a>
+                    </h4>
+                </div>
+                <div id="collapseOne" class="panel-collapse collapse">
+                <div class="panel-body">
+                    <table class="table table-hover">
+                    <tr>
+                        <th>ID</th>
+                        <th>Naam</th>
+                        <th>Beschrijving</th>
+                        <th>Type</th>
+                        <th>Aangemaakt op</th>
+                        <th>Verwijderd</th>
+                    </tr>
+        '''
+
+        for row in fetchEvidences:
+            html += ('<tr>')
+            html += ('<td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td>'
+                     '<td>{4}</td><td>{5}</td>'
+                     .format(row[0],
+                             row[1],
+                             row[2] if row[2] != '' else '-',
+                             'PC / Laptop / Server' if str(row[3]) == '1'
+                             else 'Device (USB, SD, HDD)',
+                             row[4],
+                             'Ja' if str(row[5]) == '1' else 'Nee'))
+            html += ('</tr>')
+
+        html += '''
+            </table>
+            </div>
+            </div>
+            </div>
+            <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a class="accordion-toggle collapsed"
+                    data-toggle="collapse" data-parent="#accordion"
+                    href="#collapseTwo">Algemeen</a>
+                </h4>
+            </div>
+            <div id="collapseTwo" class="panel-collapse collapse">
+            <div class="panel-body">
+                <table class="table table-hover">
+                <tr>
+                    <th>ID</th>
+                    <th>Naam</th>
+                    <th>Beschrijving</th>
+                    <th>Aangemaakt op</th>
+                </tr>
+        '''
+
+        for row in fetchGeneral:
+            html += ('<tr>')
+            html += ('<td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td>'
+                     .format(row[0],
+                             row[1],
+                             row[2] if row[2] != '' else '-',
+                             row[3]))
+            html += ('</tr>')
+
+        html += '''
+            </table>
+            </div>
+            </div>
+            </div>
+            <div class="faqHeader">Modules</div>
+        '''
+
+        #  END BODY HTML
+        #  START IF HARDWARE
+
+        if fetchHardware and evidenceType == '1':
+            html += '''
+                <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a class="accordion-toggle collapsed"
+                        data-toggle="collapse" data-parent="#accordion"
+                        href="#collapseThree">Hardware info</a>
+                    </h4>
+                </div>
+                <div id="collapseThree" class="panel-collapse collapse">
+                <div class="panel-body">
+                <table class="table table-hover">
+                <tr>
+                    <th>ID</th>
+                    <th>CPU</th>
+                    <th>USB Devices</th>
+                    <th>Architectuur</th>
+                    <th>CPU Naam</th>
+                    <th>CPU Family</th>
+                    <th>Gebruikte Geheugen</th>
+                    <th>Vrije Geheugen</th>
+                    <th>Totaal Geheugen</th>
+                </tr>
+            '''
+
+            for row in fetchHardware:
+                html += ('<tr>')
+                html += ('<td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td>'
+                         '<td>{4}</td><td>{5}</td><td>{6}</td><td>{7}</td>'
+                         '<td>{8}</td>'
+                         .format(row[0],
+                                 iconRemove if str(row[1]) == 'None'
+                                 else row[1],
+                                 iconRemove if str(row[2]) == 'None'
+                                 else row[2],
+                                 iconRemove if str(row[3]) == 'None'
+                                 else row[3],
+                                 iconRemove if str(row[4]) == 'None'
+                                 else row[4],
+                                 iconRemove if str(row[5]) == 'None'
+                                 else row[5],
+                                 iconRemove if str(row[6]) == 'None'
+                                 else row[6],
+                                 iconRemove if str(row[7]) == 'None'
+                                 else row[7],
+                                 iconRemove if str(row[8]) == 'None'
+                                 else row[8]))
+                html += ('</tr>')
+
+            html += '''
+                </table>
+                </div>
+                </div>
+                </div>
+            '''
+
+        #  END IF HARDWARE
+        #  START IF SOFTWARE
+
+        if fetchSoftware and evidenceType == '1':
+            html += '''
+                <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a class="accordion-toggle collapsed"
+                        data-toggle="collapse" data-parent="#accordion"
+                        href="#collapseFour">Software lijst</a>
+                    </h4>
+                </div>
+                <div id="collapseFour" class="panel-collapse collapse">
+                <div class="panel-body">
+                <table class="table table-hover">
+                <tr>
+                    <th>ID</th>
+                    <th>Naam</th>
+                </tr>
+            '''
+
+            for row in fetchSoftware:
+                html += ('<tr>')
+                html += ('<td>{0}</td><td>{1}</td>'
+                         .format(row[0], row[1].encode('utf-8')))
+                html += ('</tr>')
+
+            html += '''
+                </table>
+                </div>
+                </div>
+                </div>
+            '''
+
+        #  END IF SOFTWARE
+        #  START IF CLOUD
+
+        if fetchCloud and evidenceType == '1':
+            html += '''
+                <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a class="accordion-toggle collapsed"
+                        data-toggle="collapse" data-parent="#accordion"
+                        href="#collapseFive">Cloud gebruik</a>
+                    </h4>
+                </div>
+                <div id="collapseFive" class="panel-collapse collapse">
+                <div class="panel-body">
+                <table class="table table-hover">
+                <tr>
+                    <th>ID</th>
+                    <th>Dropbox</th>
+                    <th>OneDrive</th>
+                    <th>Evernote</th>
+                    <th>Google Drive</th>
+                </tr>
+            '''
+
+            for row in fetchCloud:
+                html += ('<tr>')
+                html += ('<td>{0}</td><td>{1}</td><td>{2}</td>'
+                         '<td>{3}</td><td>{4}</td>'
+                         .format(row[0],
+                                 iconOk if str(row[1]) == '1' else iconRemove,
+                                 iconOk if str(row[2]) == '1' else iconRemove,
+                                 iconOk if str(row[3]) == '1' else iconRemove,
+                                 iconOk if str(row[4]) == '1' else iconRemove))
+                html += ('</tr>')
+
+            html += '''
+                </table>
+                </div>
+                </div>
+                </div>
+            '''
+
+        #  END IF CLOUD
+        #  START IF BROWSER
+
+        if fetchBrowser and evidenceType == '1':
+            html += '''
+                <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a class="accordion-toggle collapsed"
+                        data-toggle="collapse" data-parent="#accordion"
+                        href="#collapseSix">Browser history</a>
+                    </h4>
+                </div>
+                <div id="collapseSix" class="panel-collapse collapse">
+                <div class="panel-body">
+                <table class="table table-hover">
+                <tr>
+                    <th>ID</th>
+                    <th>Chrome</th>
+                    <th>FireFox</th>
+                    <th>Internet Explorer</th>
+                </tr>
+            '''
+
+            for row in fetchBrowser:
+                iconCh = ('<a href="data' + opeSysSlash + casename +
+                          opeSysSlash + eName + opeSysSlash +
+                          'Chrome_History">' + iconOk + '</a>')
+                iconFf = ('<a href="data' + opeSysSlash + casename +
+                          opeSysSlash + eName + opeSysSlash +
+                          'frfox_places.sqlite">' + iconOk + '</a>')
+
+                html += ('<tr>')
+                html += ('<td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td>'
+                         .format(row[0],
+                                 iconCh if str(row[1]) == '1' else iconRemove,
+                                 iconFf if str(row[2]) == '1' else iconRemove,
+                                 iconOk if str(row[3]) == '1'
+                                 else iconRemove,))
+                html += ('</tr>')
+
+            html += '''
+                </table>
+                </div>
+                </div>
+                </div>'''
+
+        #  END IF BROWSER
+        #  START IF DRIVES
+
+        if fetchDrive and evidenceType == '1':
+            html += '''
+                <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a class="accordion-toggle collapsed"
+                        data-toggle="collapse" data-parent="#accordion"
+                        href="#collapseSeven">Detected drives</a>
+                    </h4>
+                </div>
+                <div id="collapseSeven" class="panel-collapse collapse">
+                <div class="panel-body">
+                <table class="table table-hover">
+                <tr>
+                    <th>ID</th>
+                    <th>Drive Naam</th>
+                    <th>Drive Mount</th>
+                    <th>Drive filesystem</th>
+                </tr>
+            '''
+
+            for row in fetchDrive:
+                html += ('<tr>')
+                html += ('<td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td>'
+                         .format(row[0],
+                                 row[1],
+                                 row[2],
+                                 row[3]))
+                html += ('</tr>')
+
+            html += '''
+                </table>
+                </div>
+                </div>
+                </div>
+            '''
+
+        #  END IF DRIVES
+        #  START IF FILE HASH
+
+        if fetchFiles:
+            html += '''
+                <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a class="accordion-toggle collapsed"
+                        data-toggle="collapse" data-parent="#accordion"
+                        href="#collapseEight">File hashing</a>
+                    </h4>
+                </div>
+                <div id="collapseEight" class="panel-collapse collapse">
+                <div class="panel-body">
+                <table class="table table-hover">
+            '''
+
+            if len(fetchFiles) == 10:
+                message = ('<b>Info</b>: Er bevinden zich meer dan 10 '
+                           'bestanden in de database. Er worden er hieronder '
+                           '10 getoond. <a href="' + casepath + namef + '">'
+                           'Klik hier</a> om alle bestanden te zien.')
+
+                html += '''
+                    <div class="alert alert-success alert-dismissible"
+                    role="alert"><button type="button" class="close"
+                    data-dismiss="alert"><span aria-hidden="true">&times;
+                    </span><span class="sr-only">Close</span></button>
+                        ''' + message + '''
+                    </div>
+                '''
+
+            html += '''
+                <tr>
+                    <th>ID</th>
+                    <th>Bestandsnaam</th>
+                    <th>Size</th>
+                    <th>SHA</th>
+                    <th>MD5</th></tr>
+            '''
+
+            for row in fetchFiles:
+                html += ('<tr>')
+                html += ('<td>{0}</td><td>{1}</td><td>{2}</td>'
+                         '<td>{3}</td><td>{4}</td>'
+                         .format(row[0],
+                                 row[1],
+                                 row[2],
+                                 row[3],
+                                 iconRemove if str(row[4]) == 'None'
+                                 else row[4]))
+                html += ('</tr>')
+
+            html += '''
+                </table>
+                </div>
+                </div>
+                </div>
+            '''
+
+        #  END IF FILE HASH
+        #  IF FILE HIERARCHY
+
+        if fetchFilesOverview:
+            html += '''
+                <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a class="accordion-toggle collapsed"
+                        data-toggle="collapse" data-parent="#accordion"
+                        href="#collapseEightB">File hiarchie</a>
+                    </h4>
+                </div>
+                <div id="collapseEightB" class="panel-collapse collapse">
+                <div class="panel-body">
+            '''
+
+            for row in fetchFilesOverview:
+                html += row[0]
+
+            html += '''
+                </div>
+                </div>
+                </div>
+            '''
+
+        #  END FILE HIERARCHY
+        #  IF LINUX LOGON
+
+        if fetchLinuxLogin and evidenceType == '1':
+            html += '''
+                <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a class="accordion-toggle collapsed"
+                        data-toggle="collapse" data-parent="#accordion"
+                        href="#collapseNine">Linux login items</a>
+                    </h4>
+                </div>
+                <div id="collapseNine" class="panel-collapse collapse">
+                <div class="panel-body">
+                <table class="table table-hover">
+                <tr>
+                    <th>ID</th>
+                    <th>Naam</th>
+                </tr>
+            '''
+
+            for row in fetchLinuxLogin:
+                html += ('<tr>')
+                html += ('<td>{0}</td><td>{1}</td>'
+                         .format(row[0], row[1]))
+                html += ('</tr>')
+
+            html += '''
+                </table>
+                </div>
+                </div>
+                </div>
+            '''
+
+        #  END IF LINUX LOGON
+        #  START WINDOWS LOGON
+
+        if fetchWindowsLogon and evidenceType == '1':
+            html == '''
+                <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a class="accordion-toggle collapsed"
+                        data-toggle="collapse" data-parent="#accordion"
+                        href="#collapseEleven">Windows startup applications</a>
+                    </h4>
+                </div>
+                <div id="collapseEleven" class="panel-collapse collapse">
+                <div class="panel-body">
+                <table class="table table-hover">
+                <tr>
+                    <th>ID</th>
+                    <th>Naam</th>
+                </tr>
+            '''
+
+            for row in fetchWindowsLogon:
+                html += ('<tr>')
+                html += ('<td>{0}</td><td>{1}</td>'
+                         .format(row[0],
+                                 row[1]))
+                html += ('</tr>')
+
+            html += '''
+                </table>
+                </div>
+                </div>
+                </div>
+            '''
+
+        #  END IF LINUX LOGON
+        #  START IF NETWORK
+
+        if fetchNetwork and evidenceType == '1':
+            html += '''
+                <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a class="accordion-toggle collapsed"
+                        data-toggle="collapse" data-parent="#accordion"
+                        href="#collapseThirteen">Networking details</a>
+                    </h4>
+                </div>
+                <div id="collapseThirteen" class="panel-collapse collapse">
+                <div class="panel-body">
+                <table class="table table-hover">
+                <tr>
+                    <th>ID</th>
+                    <th>IP</th>
+                    <th>MAC</th>
+                    <th>IP Connected</th>
+                </tr>
+            '''
+
+            for row in fetchNetwork:
+                html += ('<tr>')
+                html += ('<td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td>'
+                         .format(row[0], row[1],
+                                 iconRemove if str(row[2]) == 'None'
+                                 else row[2],
+                                 iconRemove if str(row[3]) == 'None'
+                                 else row[3]))
+                html += ('</tr>')
+
+            html += '''
+                </table>
+                </div>
+                </div>
+                </div>
+            '''
+
+        #  END IF NETWORK
+        #  START IF PSLIST
+
+        if fetchPslist and evidenceType == '1':
+            html += '''
+                <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a class="accordion-toggle collapsed"
+                        data-toggle="collapse" data-parent="#accordion"
+                        href="#collapseThirteenB">Processen</a>
+                    </h4>
+                </div>
+                <div id="collapseThirteenB" class="panel-collapse collapse">
+                <div class="panel-body">
+                <table class="table table-hover">
+                <tr>
+                    <th>ID</th>
+                    <th>Naam</th>
+                </tr>
+            '''
+
+            for row in fetchPslist:
+                boundName = '[bound method Process.name of ['
+                i = str(row[1]).encode('utf-8')
+                process = i.replace('<', '[')
+                process = process.replace('>', ']')
+                process = process.replace(boundName, '')
+                process = process.replace(']]', '')
+                html += ('<tr>')
+                html += ('<td>{0}</td><td>{1}</td>'
+                         .format(row[0], process))
+                html += ('</tr>')
+
+            html += '''
+                </table>
+                </div>
+                </div>
+                </div>
+            '''
+
+        #  END IF PSLIST
+        #  START LOGGING
+
+        html += '''
+            <div class="faqHeader">Logging</div>
+            <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a class="accordion-toggle collapsed"
+                    data-toggle="collapse" data-parent="#accordion"
+                    href="#collapseLogOne">Case logging</a>
+                </h4>
+            </div>
+            <div id="collapseLogOne" class="panel-collapse collapse">
+            <div class="panel-body">
+            <table class="table table-hover">
+            <tr>
+                <th>ID</th>
+                <th>Date</th>
+                <th>Timestamp</th>
+                <th>Level</th>
+                <th>Omschrijving</th>
+            </tr>
+        '''
+
+        for row in fetchLogCase:
+            html += ('<tr>')
+            html += ('<td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td>'
+                     '<td>{4}</td>'
+                     .format(row[0], row[1], row[2],
+                             'warning' if str(row[3]) == 'w'
+                             else 'info',
+                             row[4]))
+            html += ('</tr>')
+
+        html += '''
+            </table>
+            </div>
+            </div>
+            </div>
+        '''
+
+        html += '''
+            <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a class="accordion-toggle collapsed"
+                    data-toggle="collapse" data-parent="#accordion"
+                    href="#collapseLogTwo">Pythronic logging</a>
+                </h4>
+            </div>
+            <div id="collapseLogTwo" class="panel-collapse collapse">
+            <div class="panel-body">
+            <table class="table table-hover">
+            <tr>
+                <th>ID</th>
+                <th>Date</th>
+                <th>Timestamp</th>
+                <th>Level</th>
+                <th>Omschrijving</th>
+            </tr>
+        '''
+
+        for row in fetchLogPythronic:
+            html += ('<tr>')
+            html += ('<td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td>'
+                     '<td>{4}</td>'
+                     .format(row[0], row[1], row[2],
+                             'warning' if str(row[3]) == 'w'
+                             else 'info',
+                             row[4]))
+            html += ('</tr>')
+
+        html += '''
+            </table>
+            </div>
+            </div>
+            </div>
+        '''
+
+        #  END LOGGING
+        #  START BAR STYLING
+
+        html += '''
+            <style>
+                .faqHeader {
+                    font-size: 27px;
+                    margin: 20px;
+                }
+
+                .panel-heading [data-toggle="collapse"]:after {
+                    font-family: 'Glyphicons Halflings';
+                    content: "\e072"; /* "play" icon */
+                    float: right;
+                    color: #F58723;
+                    font-size: 18px;
+                    line-height: 22px;
+                    /* rotate "play" icon from > (right arrow) to down arrow */
+                    -webkit-transform: rotate(-90deg);
+                    -moz-transform: rotate(-90deg);
+                    -ms-transform: rotate(-90deg);
+                    -o-transform: rotate(-90deg);
+                    transform: rotate(-90deg);
+                }
+
+                .panel-heading [data-toggle="collapse"].collapsed:after {
+                    -webkit-transform: rotate(90deg);
+                    -moz-transform: rotate(90deg);
+                    -ms-transform: rotate(90deg);
+                    -o-transform: rotate(90deg);
+                    transform: rotate(90deg);
+                    color: #454444;
+                }
+            </style>
+        '''
+
+        #  END BAR STYLING
+        #  START END HTML
+
+        html += '''
+            </div>
+            </body>
+            </html>
+        '''
+
+        #  END END HTML
+
+        file = open(casepath + name, 'w')
+        file.write(html)
+        file.close()
+
+        print '\n [INFO]: Report created. Path: ' + casepath + namef + '.\n'
+
+        result = True
+    except:
+        pass
+
+    return result
 
 
 #  END SCAN ITEMS

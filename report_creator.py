@@ -16,7 +16,9 @@ def makeRapport():
                       'aria-hidden="true"></span>')
 
         db = sqlite3.connect('db/cases/klm.db')
+        db2 = sqlite3.connect('db/pythronic.db')
         cursor = db.cursor()
+        cursor2 = db2.cursor()
 
         cursor.execute('''SELECT id, name, description, type, created_at, deleted
                           FROM evidences''')
@@ -72,6 +74,18 @@ def makeRapport():
                           FROM PC_network''')
         fetchNetwork = cursor.fetchall()
 
+        cursor.execute('''SELECT id, name
+                          FROM PC_pslist''')
+        fetchPslist = cursor.fetchall()
+
+        cursor.execute('''SELECT id, ddate, datetime, level, description
+                           FROM logs''')
+        fetchLogCase = cursor.fetchall()
+
+        cursor2.execute('''SELECT id, ddate, datetime, level, description
+                           FROM logs''')
+        fetchLogPythronic = cursor2.fetchall()
+
         #  START ALL FILES HTML
 
         if fetchAllFiles:
@@ -81,7 +95,7 @@ def makeRapport():
                     <html>
                     <head>
                         <meta charset="utf-8" />
-                        <title>Pythronic - Report - Alle bestanden</title>
+                        <title>Pythronic - Rapport - Alle bestanden</title>
                         <meta name="viewport" content="width=device-width,
                         initial-scale=1.0" />
                         <link rel="stylesheet" type="text/css"
@@ -99,13 +113,14 @@ def makeRapport():
                         <h1>Pythronic <small>Alle bestanden</small></h1>
                     </div>
                     <div class="container">
-                    <div class="alert alert-info alert-dismissible" role="alert">
-                        <button type="button" class="close" data-dismiss="alert">
-                        <span aria-hidden="true">&times;</span>
-                        <span class="sr-only">Close</span></button>
-                        Dit is het automatisch gerenegeerde rapport.
-                        Bekijk de resultaten in de uitklapbare lijsten.
-                        Dit rapport maakt deel uit van een ander rapport.
+                    <div class="alert alert-info alert-dismissible"
+                    role="alert">
+                    <button type="button" class="close" data-dismiss="alert">
+                    <span aria-hidden="true">&times;</span>
+                    <span class="sr-only">Close</span></button>
+                    Dit is het automatisch gerenegeerde rapport.
+                    Bekijk de resultaten in de uitklapbare lijsten.
+                    Dit rapport maakt deel uit van een ander rapport.
                     </div>
                     <div class="panel-group" id="accordion">
                     <div class="panel panel-default">
@@ -147,33 +162,33 @@ def makeRapport():
                     </div>
                     </div>
                     <style>
-                        .faqHeader {
-                            font-size: 27px;
-                            margin: 20px;
-                        }
+                    .faqHeader {
+                        font-size: 27px;
+                        margin: 20px;
+                    }
 
-                        .panel-heading [data-toggle="collapse"]:after {
-                            font-family: 'Glyphicons Halflings';
-                            content: "\e072"; /* "play" icon */
-                            float: right;
-                            color: #F58723;
-                            font-size: 18px;
-                            line-height: 22px;
-                            -webkit-transform: rotate(-90deg);
-                            -moz-transform: rotate(-90deg);
-                            -ms-transform: rotate(-90deg);
-                            -o-transform: rotate(-90deg);
-                            transform: rotate(-90deg);
-                        }
+                    .panel-heading [data-toggle="collapse"]:after {
+                        font-family: 'Glyphicons Halflings';
+                        content: "\e072"; /* "play" icon */
+                        float: right;
+                        color: #F58723;
+                        font-size: 18px;
+                        line-height: 22px;
+                        -webkit-transform: rotate(-90deg);
+                        -moz-transform: rotate(-90deg);
+                        -ms-transform: rotate(-90deg);
+                        -o-transform: rotate(-90deg);
+                        transform: rotate(-90deg);
+                    }
 
-                        .panel-heading [data-toggle="collapse"].collapsed:after {
-                            -webkit-transform: rotate(90deg);
-                            -moz-transform: rotate(90deg);
-                            -ms-transform: rotate(90deg);
-                            -o-transform: rotate(90deg);
-                            transform: rotate(90deg);
-                            color: #454444;
-                        }
+                    .panel-heading [data-toggle="collapse"].collapsed:after {
+                        -webkit-transform: rotate(90deg);
+                        -moz-transform: rotate(90deg);
+                        -ms-transform: rotate(90deg);
+                        -o-transform: rotate(90deg);
+                        transform: rotate(90deg);
+                        color: #454444;
+                    }
                     </style>
                     </div>
                     </body>
@@ -195,7 +210,7 @@ def makeRapport():
             <html>
             <head>
                 <meta charset="utf-8" />
-                <title>Pythronic - Report</title>
+                <title>Pythronic - Rapport</title>
                 <meta name="viewport" content="width=device-width,
                 initial-scale=1.0" />
                 <link rel="stylesheet" type="text/css"
@@ -738,6 +753,126 @@ def makeRapport():
             '''
 
         #  END IF NETWORK
+        #  START IF PSLIST
+
+        if fetchPslist and evidenceType == '1':
+            html += '''
+                <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a class="accordion-toggle collapsed"
+                        data-toggle="collapse" data-parent="#accordion"
+                        href="#collapseThirteenB">Processen</a>
+                    </h4>
+                </div>
+                <div id="collapseThirteenB" class="panel-collapse collapse">
+                <div class="panel-body">
+                <table class="table table-hover">
+                <tr>
+                    <th>ID</th>
+                    <th>Naam</th>
+                </tr>
+            '''
+
+            for row in fetchPslist:
+                i = str(row[1]).encode('utf-8')
+                process = i.replace('<', '[')
+                process = process.replace('>', ']')
+                process = process.replace('[bound method Process.name of [', '')
+                process = process.replace(']]', '')
+                html += ('<tr>')
+                html += ('<td>{0}</td><td>{1}</td>'
+                         .format(row[0], process))
+                html += ('</tr>')
+
+            html += '''
+                </table>
+                </div>
+                </div>
+                </div>
+            '''
+
+        #  END IF PSLIST
+        #  START LOGGING
+
+        html += '''
+            <div class="faqHeader">Logging</div>
+            <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a class="accordion-toggle collapsed"
+                    data-toggle="collapse" data-parent="#accordion"
+                    href="#collapseLogOne">Case logging</a>
+                </h4>
+            </div>
+            <div id="collapseLogOne" class="panel-collapse collapse">
+            <div class="panel-body">
+            <table class="table table-hover">
+            <tr>
+                <th>ID</th>
+                <th>Date</th>
+                <th>Timestamp</th>
+                <th>Level</th>
+                <th>Omschrijving</th>
+            </tr>
+        '''
+
+        for row in fetchLogCase:
+            html += ('<tr>')
+            html += ('<td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td>'
+                     '<td>{4}</td>'
+                     .format(row[0], row[1], row[2],
+                             'warning' if str(row[3]) == 'w'
+                             else 'info',
+                             row[4]))
+            html += ('</tr>')
+
+        html += '''
+            </table>
+            </div>
+            </div>
+            </div>
+        '''
+
+        html += '''
+            <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a class="accordion-toggle collapsed"
+                    data-toggle="collapse" data-parent="#accordion"
+                    href="#collapseLogTwo">Pythronic logging</a>
+                </h4>
+            </div>
+            <div id="collapseLogTwo" class="panel-collapse collapse">
+            <div class="panel-body">
+            <table class="table table-hover">
+            <tr>
+                <th>ID</th>
+                <th>Date</th>
+                <th>Timestamp</th>
+                <th>Level</th>
+                <th>Omschrijving</th>
+            </tr>
+        '''
+
+        for row in fetchLogPythronic:
+            html += ('<tr>')
+            html += ('<td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td>'
+                     '<td>{4}</td>'
+                     .format(row[0], row[1], row[2],
+                             'warning' if str(row[3]) == 'w'
+                             else 'info',
+                             row[4]))
+            html += ('</tr>')
+
+        html += '''
+            </table>
+            </div>
+            </div>
+            </div>
+        '''
+
+        #  END LOGGING
         #  START BAR STYLING
 
         html += '''
