@@ -1,5 +1,10 @@
 import sqlite3
 
+opeSysSlash = '/'
+casename = 'klm'
+eName = 'PC'
+evidenceType = '1'
+
 
 def makeRapport():
     result = False
@@ -10,7 +15,7 @@ def makeRapport():
         iconRemove = ('<span class="glyphicon glyphicon-remove"'
                       'aria-hidden="true"></span>')
 
-        db = sqlite3.connect('db/cases/Bart.db')
+        db = sqlite3.connect('db/cases/klm.db')
         cursor = db.cursor()
 
         cursor.execute('''SELECT id, name, description, type, created_at, deleted
@@ -43,8 +48,17 @@ def makeRapport():
         fetchDrive = cursor.fetchall()
 
         cursor.execute('''SELECT id, name, size, shahash, md5hash
-                          FROM PC_files''')
+                          FROM PC_files LIMIT 0, 10''')
         fetchFiles = cursor.fetchall()
+
+        if len(fetchFiles) == 10:
+            cursor.execute('''SELECT id, name, size, shahash, md5hash
+                              FROM PC_files''')
+            fetchAllFiles = cursor.fetchall()
+
+        cursor.execute('''SELECT html_view
+                          FROM PC_files_overview''')
+        fetchFilesOverview = cursor.fetchall()
 
         cursor.execute('''SELECT id, name
                           FROM PC_linux_logon''')
@@ -57,6 +71,122 @@ def makeRapport():
         cursor.execute('''SELECT id, ip, mac, connected_ip
                           FROM PC_network''')
         fetchNetwork = cursor.fetchall()
+
+        #  START ALL FILES HTML
+
+        if fetchAllFiles:
+            try:
+                html2 = '''
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <meta charset="utf-8" />
+                        <title>Pythronic - Report - Alle bestanden</title>
+                        <meta name="viewport" content="width=device-width,
+                        initial-scale=1.0" />
+                        <link rel="stylesheet" type="text/css"
+                        href="bootstrap/css/bootstrap.min.css" />
+                        <link rel="stylesheet" type="text/css"
+                        href="bootstrap/css/font-awesome.min.css" />
+                        <script type="text/javascript"
+                        src="bootstrap/js/jquery-1.10.2.min.js"></script>
+                        <script type="text/javascript"
+                        src="bootstrap/js/bootstrap.min.js"></script>
+                    </head>
+                    <body>
+                    <div class="container">
+                    <div class="page-header">
+                        <h1>Pythronic <small>Alle bestanden</small></h1>
+                    </div>
+                    <div class="container">
+                    <div class="alert alert-info alert-dismissible" role="alert">
+                        <button type="button" class="close" data-dismiss="alert">
+                        <span aria-hidden="true">&times;</span>
+                        <span class="sr-only">Close</span></button>
+                        Dit is het automatisch gerenegeerde rapport.
+                        Bekijk de resultaten in de uitklapbare lijsten.
+                        Dit rapport maakt deel uit van een ander rapport.
+                    </div>
+                    <div class="panel-group" id="accordion">
+                    <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a class="accordion-toggle"
+                            data-toggle="collapse" data-parent="#accordion"
+                            href="#collapseOne"> Alle bestanden</a>
+                        </h4>
+                    </div>
+                    <div id="collapseOne" class="panel-collapse">
+                    <div class="panel-body">
+                        <table class="table table-hover">
+                        <tr>
+                            <th>ID</th>
+                            <th>Naam</th>
+                            <th>Size</th>
+                            <th>SHA</th>
+                            <th>MD5</th>
+                        </tr>
+                '''
+
+                for row in fetchAllFiles:
+                    html2 += ('<tr>')
+                    html2 += ('<td>{0}</td><td>{1}</td><td>{2}</td>'
+                              '<td>{3}</td><td>{4}</td>'
+                              .format(row[0],
+                                      row[1],
+                                      row[2],
+                                      row[3],
+                                      iconRemove if str(row[4]) == 'None'
+                                      else row[4]))
+                    html2 += ('</tr>')
+
+                html2 += '''
+                    </table>
+                    </div>
+                    </div>
+                    </div>
+                    </div>
+                    <style>
+                        .faqHeader {
+                            font-size: 27px;
+                            margin: 20px;
+                        }
+
+                        .panel-heading [data-toggle="collapse"]:after {
+                            font-family: 'Glyphicons Halflings';
+                            content: "\e072"; /* "play" icon */
+                            float: right;
+                            color: #F58723;
+                            font-size: 18px;
+                            line-height: 22px;
+                            -webkit-transform: rotate(-90deg);
+                            -moz-transform: rotate(-90deg);
+                            -ms-transform: rotate(-90deg);
+                            -o-transform: rotate(-90deg);
+                            transform: rotate(-90deg);
+                        }
+
+                        .panel-heading [data-toggle="collapse"].collapsed:after {
+                            -webkit-transform: rotate(90deg);
+                            -moz-transform: rotate(90deg);
+                            -ms-transform: rotate(90deg);
+                            -o-transform: rotate(90deg);
+                            transform: rotate(90deg);
+                            color: #454444;
+                        }
+                    </style>
+                    </div>
+                    </body>
+                    </html>
+                '''
+
+                file = open('report_files.html', 'w')
+                file.write(html2)
+                file.close()
+            except:
+                pass
+
+        #  END ALL FILES HTML
 
         #  START START HTML
 
@@ -76,6 +206,17 @@ def makeRapport():
                 src="bootstrap/js/jquery-1.10.2.min.js"></script>
                 <script type="text/javascript"
                 src="bootstrap/js/bootstrap.min.js"></script>
+
+                <link rel="stylesheet"
+                href="bootstrap/css/folder-tree-static.css" type="text/css">
+                <link rel="stylesheet" href="bootstrap/css/context-menu.css"
+                type="text/css">
+                <script type="text/javascript" src="bootstrap/js/ajax.js">
+                </script>
+                <script type="text/javascript"
+                src="bootstrap/js/folder-tree-static.js"></script>
+                <script type="text/javascript"
+                src="bootstrap/js/context-menu.js"></script>
             </head>
         '''
 
@@ -170,14 +311,14 @@ def makeRapport():
             </div>
             </div>
             </div>
+            <div class="faqHeader">Modules</div>
         '''
 
         #  END BODY HTML
         #  START IF HARDWARE
 
-        if fetchHardware:
+        if fetchHardware and evidenceType == '1':
             html += '''
-                <div class="faqHeader">Modules</div>
                 <div class="panel panel-default">
                 <div class="panel-heading">
                     <h4 class="panel-title">
@@ -236,7 +377,7 @@ def makeRapport():
         #  END IF HARDWARE
         #  START IF SOFTWARE
 
-        if fetchSoftware:
+        if fetchSoftware and evidenceType == '1':
             html += '''
                 <div class="panel panel-default">
                 <div class="panel-heading">
@@ -258,7 +399,7 @@ def makeRapport():
             for row in fetchSoftware:
                 html += ('<tr>')
                 html += ('<td>{0}</td><td>{1}</td>'
-                         .format(row[0], row[1]))
+                         .format(row[0], row[1].encode('utf-8')))
                 html += ('</tr>')
 
             html += '''
@@ -271,7 +412,7 @@ def makeRapport():
         #  END IF SOFTWARE
         #  START IF CLOUD
 
-        if fetchCloud:
+        if fetchCloud and evidenceType == '1':
             html += '''
                 <div class="panel panel-default">
                 <div class="panel-heading">
@@ -314,7 +455,7 @@ def makeRapport():
         #  END IF CLOUD
         #  START IF BROWSER
 
-        if fetchBrowser:
+        if fetchBrowser and evidenceType == '1':
             html += '''
                 <div class="panel panel-default">
                 <div class="panel-heading">
@@ -336,11 +477,18 @@ def makeRapport():
             '''
 
             for row in fetchBrowser:
+                iconCh = ('<a href="data' + opeSysSlash + casename +
+                          opeSysSlash + eName + opeSysSlash +
+                          'Chrome_History">' + iconOk + '</a>')
+                iconFf = ('<a href="data' + opeSysSlash + casename +
+                          opeSysSlash + eName + opeSysSlash +
+                          'frfox_places.sqlite">' + iconOk + '</a>')
+
                 html += ('<tr>')
                 html += ('<td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td>'
                          .format(row[0],
-                                 iconOk if str(row[1]) == '1' else iconRemove,
-                                 iconOk if str(row[2]) == '1' else iconRemove,
+                                 iconCh if str(row[1]) == '1' else iconRemove,
+                                 iconFf if str(row[2]) == '1' else iconRemove,
                                  iconOk if str(row[3]) == '1'
                                  else iconRemove,))
                 html += ('</tr>')
@@ -354,7 +502,7 @@ def makeRapport():
         #  END IF BROWSER
         #  START IF DRIVES
 
-        if fetchDrive:
+        if fetchDrive and evidenceType == '1':
             html += '''
                 <div class="panel panel-default">
                 <div class="panel-heading">
@@ -407,6 +555,23 @@ def makeRapport():
                 <div id="collapseEight" class="panel-collapse collapse">
                 <div class="panel-body">
                 <table class="table table-hover">
+            '''
+
+            if len(fetchFiles) == 10:
+                message = ('<b>Info</b>: Er bevinden zich meer dan 10 '
+                           'bestanden in de database. Er worden er hieronder '
+                           '10 getoond.')
+
+                html += '''
+                    <div class="alert alert-success alert-dismissible"
+                    role="alert"><button type="button" class="close"
+                    data-dismiss="alert"><span aria-hidden="true">&times;
+                    </span><span class="sr-only">Close</span></button>
+                        ''' + message + '''
+                    </div>
+                '''
+
+            html += '''
                 <tr>
                     <th>ID</th>
                     <th>Bestandsnaam</th>
@@ -435,9 +600,35 @@ def makeRapport():
             '''
 
         #  END IF FILE HASH
+        #  IF FILE HIERARCHY
+
+        if fetchFilesOverview:
+            html += '''
+                <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a class="accordion-toggle collapsed"
+                        data-toggle="collapse" data-parent="#accordion"
+                        href="#collapseEightB">File hiarchie</a>
+                    </h4>
+                </div>
+                <div id="collapseEightB" class="panel-collapse collapse">
+                <div class="panel-body">
+            '''
+
+            for row in fetchFilesOverview:
+                html += row[0]
+
+            html += '''
+                </div>
+                </div>
+                </div>
+            '''
+
+        #  END FILE HIERARCHY
         #  IF LINUX LOGON
 
-        if fetchLinuxLogin:
+        if fetchLinuxLogin and evidenceType == '1':
             html += '''
                 <div class="panel panel-default">
                 <div class="panel-heading">
@@ -472,7 +663,7 @@ def makeRapport():
         #  END IF LINUX LOGON
         #  START WINDOWS LOGON
 
-        if fetchWindowsLogon:
+        if fetchWindowsLogon and evidenceType == '1':
             html == '''
                 <div class="panel panel-default">
                 <div class="panel-heading">
@@ -508,7 +699,7 @@ def makeRapport():
         #  END IF LINUX LOGON
         #  START IF NETWORK
 
-        if fetchNetwork:
+        if fetchNetwork and evidenceType == '1':
             html += '''
                 <div class="panel panel-default">
                 <div class="panel-heading">

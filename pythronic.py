@@ -744,17 +744,17 @@ def startScan(casename, eName, eType):
         if scanComputerDrives(casename, eName):
             print ' [X]', 'Drives settings completed.'
         else:
-            print ' [ ]', 'Software settings passed.'
+            print ' [ ]', 'Drives settings passed.'
 
         if scanComputerPslist(casename, eName):
             print ' [X]', 'Process settings completed.'
         else:
-            print ' [ ]', 'Software settings passed.'
+            print ' [ ]', 'Process list settings passed.'
 
         if scanComputerNetwork(casename, eName):
             print ' [X]', 'Network settings completed.'
         else:
-            print ' [ ]', 'Software settings passed.'
+            print ' [ ]', 'Network settings passed.'
 
         if ROOT:
             if scanEvidenceHash(casename, eName, ROOT):
@@ -1491,8 +1491,7 @@ def scanEvidenceFileHierarchieHTML(d):
     extText = ['.txt', '.log']
 
     try:
-        path = os.path.isfile(os.path.join(d, f))
-        files = [f for f in os.listdir(d) if path]
+        files = [f for f in os.listdir(d) if os.path.isfile(os.path.join(d,f))]
 
         for file in files:
             ext = os.path.splitext(file)[1]
