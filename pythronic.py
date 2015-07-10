@@ -44,6 +44,10 @@ except:
     pass
 
 
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
+
 opeSys = None
 opeSysSlash = None
 user = None
@@ -982,8 +986,8 @@ def scanComputerStartup(casename, eName):
             result = True
         elif opeSys == 'win32' or opeSys == 'windows':
             startUpItems = []
-            aReg = ConnectRegistry(None, HKEY_LOCAL_MACHINE)
-            aKey = OpenKey(aReg, r"SOFTWARE\Microsoft\Windows\CurrentVersion\Run")
+            a = ConnectRegistry(None, HKEY_LOCAL_MACHINE)
+            aKey = OpenKey(a, r"SOFTWARE\Microsoft\Windows\CurrentVersion\Run")
 
             for i in range(1024):
                 try:
@@ -1298,7 +1302,8 @@ def scanComputerSoftware(casename, eName):
     try:
         if _platform == 'win32':
             uninstall = ConnectRegistry(None, HKEY_LOCAL_MACHINE)
-            regcontent = OpenKey(uninstall, r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall")
+            regcontent = OpenKey(uninstall, r"SOFTWARE\Microsoft\Windows\"
+                                 "CurrentVersion\Uninstall")
             for i in range(1024):
                 try:
                     keyname = EnumKey(regcontent, i)
@@ -1309,7 +1314,8 @@ def scanComputerSoftware(casename, eName):
                     pass
 
             uninstall = ConnectRegistry(None, HKEY_LOCAL_MACHINE)
-            regcontent = OpenKey(uninstall, r"SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall")
+            regcontent = OpenKey(uninstall, r"SOFTWARE\Wow6432Node\Microsoft\"
+                                 "Windows\CurrentVersion\Uninstall")
             for i in range(1024):
                 try:
                     keyname = EnumKey(regcontent, i)
@@ -1566,7 +1572,8 @@ def scanEvidenceFileHierarchieHTML(d):
     extText = ['.txt', '.log']
 
     try:
-        files = [f for f in os.listdir(d) if os.path.isfile(os.path.join(d, f))]
+        path = os.path.join(d, f)
+        files = [f for f in os.listdir(d) if os.path.isfile(path)]
 
         for file in files:
             ext = os.path.splitext(file)[1]
@@ -1837,11 +1844,11 @@ def makeRapport(casename, eName, evidenceType):
                 src="../../bootstrap/js/bootstrap.min.js"></script>
 
                 <link rel="stylesheet"
-                href="../../bootstrap/css/folder-tree-static.css" type="text/css">
-                <link rel="stylesheet" href="../../bootstrap/css/context-menu.css"
-                type="text/css">
-                <script type="text/javascript" src="../../bootstrap/js/ajax.js">
-                </script>
+                href="../../bootstrap/css/folder-tree-static.css"
+                type="text/css"><link rel="stylesheet"
+                href="../../bootstrap/css/context-menu.css"type="text/css">
+                <script type="text/javascript"
+                src="../../bootstrap/js/ajax.js"></script>
                 <script type="text/javascript"
                 src="../../bootstrap/js/folder-tree-static.js"></script>
                 <script type="text/javascript"

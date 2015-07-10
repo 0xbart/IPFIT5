@@ -60,8 +60,8 @@ def createDBUser(db):
                 db.commit()
                 break
             else:
-                print (' \n [ERROR]: Sorry, choose a name and password '
-                       'longer then 3 characters!\n')
+                print(' \n [ERROR]: Sorry, choose a name and password '
+                      'longer then 3 characters!\n')
         except:
             print ' [Error]: User cannot be created!'
 

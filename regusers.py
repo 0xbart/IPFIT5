@@ -31,7 +31,15 @@ for i in folderkeys:
 kiesregister = str(input("Copy and paste of the specified paths completely, to read profile data:" + "\n"))
 
 aReg = ConnectRegistry(None, HKEY_LOCAL_MACHINE)
-t = OpenKey(aReg, kiesregister)
+
+for i in folderkeys:
+    print '\n\n'
+    print '###'
+    u = i.replace('r"', '')
+    j = u.replace('"', '')
+    print 'i: ' + j
+    t = OpenKey(aReg, kiesregister)
+
 # list all values for a key
 try:
     count = 0

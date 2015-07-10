@@ -4,7 +4,7 @@ from os.path import isfile, join
 import os.path
 import os
 
-path = 'enter path'
+path = '/Users/Bart/Downloads/test'
 slash = '/'
 
 
