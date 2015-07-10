@@ -1,0 +1,9 @@
+Start `python pythronic.py` OF
+
+Start 1 van de klaar gecompileerde versies:
+
+- Compiled:
+    - OSX
+    - Windows
+    - Linux
+
