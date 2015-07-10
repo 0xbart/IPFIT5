@@ -1302,7 +1302,7 @@ def scanComputerSoftware(casename, eName):
     try:
         if _platform == 'win32':
             uninstall = ConnectRegistry(None, HKEY_LOCAL_MACHINE)
-            regcontent = OpenKey(uninstall, r"SOFTWARE\Microsoft\Windows\"
+            regcontent = OpenKey(uninstall, r"SOFTWARE\Microsoft\Windows\\"
                                  "CurrentVersion\Uninstall")
             for i in range(1024):
                 try:
@@ -1314,7 +1314,7 @@ def scanComputerSoftware(casename, eName):
                     pass
 
             uninstall = ConnectRegistry(None, HKEY_LOCAL_MACHINE)
-            regcontent = OpenKey(uninstall, r"SOFTWARE\Wow6432Node\Microsoft\"
+            regcontent = OpenKey(uninstall, r"SOFTWARE\Wow6432Node\Microsoft\\"
                                  "Windows\CurrentVersion\Uninstall")
             for i in range(1024):
                 try:
